@@ -16,5 +16,6 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]                # Odoo re-exports
 "rteam_tg_auth/tests/__init__.py" = ["F401"]
+"rteam_tg_purchase/tests/__init__.py" = ["F401"]
 "rteam_tg_auth/__manifest__.py" = ["B018"]
 "rteam_tg_purchase/__manifest__.py" = ["B018"]

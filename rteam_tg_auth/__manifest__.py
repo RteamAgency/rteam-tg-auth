@@ -1,6 +1,6 @@
 {
     "name": "Rteam Telegram Approvals & 2FA",
-    "version": "19.0.2.0.2",
+    "version": "19.0.2.0.3",
     "category": "Productivity",
     "summary": "Approve POs, invoices and more from Telegram with one tap. Login 2FA included.",
     "description": """
