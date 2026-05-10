@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- Full Users admin form: Settings -> Users & Companies -> Users -->
     <record id="view_users_form_tg_2fa" model="ir.ui.view">
         <field name="name">res.users.form.rteam.tg.2fa</field>
         <field name="model">res.users</field>
@@ -24,6 +25,51 @@
                                 class="btn-secondary"
                                 icon="fa-unlink"
                                 confirm="Remove the Telegram binding for this user? Recovery codes (if generated) will be lost."
+                                invisible="tg_2fa_state == 'none'"/>
+                    </div>
+                    <field name="tg_binding_id" readonly="1">
+                        <list>
+                            <field name="state" widget="badge"/>
+                            <field name="tg_username"/>
+                            <field name="chat_id"/>
+                            <field name="bound_at"/>
+                            <field name="last_used_at"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Self-service My Preferences modal: avatar menu -> My Preferences.
+         Same content as the admin form, so users can bind without an
+         administrator opening their Users record.
+
+         Note the xmlid: view_users_form_simple_modif (the missing 'y'
+         is a long-standing typo in Odoo core, still present in v19). -->
+    <record id="view_users_form_simple_modif_tg_2fa" model="ir.ui.view">
+        <field name="name">res.users.form.simple.modif.rteam.tg.2fa</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form_simple_modif"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Telegram 2FA" name="rteam_tg_2fa">
+                    <group>
+                        <field name="tg_2fa_state"/>
+                    </group>
+                    <div class="mt-2 mb-3">
+                        <button name="action_rteam_tg_bind"
+                                type="object"
+                                string="Bind Telegram"
+                                class="btn-primary"
+                                icon="fa-telegram"
+                                invisible="tg_2fa_state == 'active'"/>
+                        <button name="action_rteam_tg_unbind"
+                                type="object"
+                                string="Unbind"
+                                class="btn-secondary"
+                                icon="fa-unlink"
+                                confirm="Remove your Telegram binding? Recovery codes (if generated) will be lost."
                                 invisible="tg_2fa_state == 'none'"/>
                     </div>
                     <field name="tg_binding_id" readonly="1">
