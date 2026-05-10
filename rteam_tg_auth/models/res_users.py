@@ -1,12 +1,18 @@
 """Glue from res.users to its Telegram binding."""
 
+import logging
 import secrets
 from datetime import timedelta
 
 from odoo import _, api, fields, models
-from odoo.exceptions import UserError
+from odoo.exceptions import AccessDenied, UserError
+from odoo.http import request
 
 DEFAULT_BIND_TTL_SECONDS = 600
+MFA_TYPE = "rteam_tg"
+MFA_URL = "/web/login/rteam_tg"
+
+_logger = logging.getLogger(__name__)
 
 
 class ResUsers(models.Model):
@@ -33,6 +39,70 @@ class ResUsers(models.Model):
         for user in self:
             binding = user.tg_binding_id[:1]
             user.tg_2fa_state = binding.state if binding else "none"
+
+    # ---------------------------------------------------------------- MFA
+
+    def _rteam_tg_2fa_required(self):
+        """True when this user must complete a Telegram 2FA challenge to log in."""
+        self.ensure_one()
+        if self.tg_2fa_state != "active":
+            return False
+        enforce = (
+            self.env["ir.config_parameter"].sudo().get_param("rteam_tg_auth.enforce_2fa", "False")
+        )
+        return str(enforce).lower() in ("1", "true", "yes")
+
+    def _mfa_type(self):
+        r = super()._mfa_type()
+        if r is not None:
+            return r
+        if self._rteam_tg_2fa_required():
+            return MFA_TYPE
+        return r
+
+    def _mfa_url(self):
+        r = super()._mfa_url()
+        if r is not None:
+            return r
+        if self._mfa_type() == MFA_TYPE:
+            return MFA_URL
+        return r
+
+    def _check_credentials(self, credentials, env):
+        if credentials.get("type") != MFA_TYPE:
+            return super()._check_credentials(credentials, env)
+
+        sudo = self.sudo()
+        binding = sudo.tg_binding_id[:1]
+        if not binding or binding.state != "active":
+            _logger.info("rteam_tg 2FA: no active binding for %r", sudo.login)
+            raise AccessDenied(_("Telegram 2FA is not configured for this user."))
+
+        ip = None
+        user_agent = None
+        if request:
+            ip = request.httprequest.environ.get("REMOTE_ADDR")
+            user_agent = request.httprequest.headers.get("User-Agent")
+
+        if binding.verify_challenge(
+            str(credentials.get("token") or ""),
+            ip=ip,
+            user_agent=user_agent,
+        ):
+            _logger.info("rteam_tg 2FA: SUCCESS for %r", sudo.login)
+            return {
+                "uid": self.env.user.id,
+                "auth_method": MFA_TYPE,
+                "mfa": "default",
+            }
+        _logger.info("rteam_tg 2FA: FAIL for %r", sudo.login)
+        raise AccessDenied(
+            _("Wrong code. Check your Telegram and try again, or request a new code.")
+        )
+
+    def _get_session_token_fields(self):
+        # Invalidate live sessions when the binding row changes (revoke / rotate).
+        return super()._get_session_token_fields() | {"tg_binding_id"}
 
     # ---------------------------------------------------------------- bind
 

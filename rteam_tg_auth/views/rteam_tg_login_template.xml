@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="tg_login_form" name="Telegram 2FA Login">
+        <t t-call="web.login_layout">
+            <t t-set="disable_footer">1</t>
+            <div class="oe_login_form">
+                <h5 class="card-title">Telegram 2FA</h5>
+
+                <form method="POST" action="" class="">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="redirect" t-att-value="redirect"/>
+                    <input type="hidden" name="action" value="verify"/>
+
+                    <div class="mb-2 mt-2 text-muted">
+                        Open Telegram and copy the 6-digit code that
+                        <strong t-if="bot_username">@<t t-esc="bot_username"/></strong>
+                        <strong t-if="not bot_username">the bot</strong>
+                        just sent you. The code expires in 5 minutes.
+                    </div>
+
+                    <p class="alert alert-info" t-if="info" role="alert">
+                        <t t-esc="info"/>
+                    </p>
+                    <p class="alert alert-danger" t-if="error" role="alert">
+                        <t t-esc="error"/>
+                    </p>
+
+                    <div class="mb-3">
+                        <label class="fw-bold" for="rteam_tg_token">Code from Telegram</label>
+                        <input id="rteam_tg_token"
+                               name="rteam_tg_token"
+                               class="form-control mb-2"
+                               autocomplete="off"
+                               inputmode="numeric"
+                               autofocus="autofocus"
+                               required="required"
+                               placeholder="e.g. 123456"/>
+                    </div>
+
+                    <div class="clearfix oe_login_buttons text-center d-grid mb-1">
+                        <button type="submit" class="btn btn-primary">Log in</button>
+                    </div>
+                </form>
+
+                <form method="POST" action="" class="mt-2">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <input type="hidden" name="redirect" t-att-value="redirect"/>
+                    <input type="hidden" name="action" value="resend"/>
+                    <div class="w-100 text-center">
+                        <button type="submit" class="btn btn-link btn-sm">Resend code</button>
+                    </div>
+                </form>
+
+                <form method="POST" action="/web/session/logout">
+                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                    <div class="w-100 text-center">
+                        <button type="submit" class="btn btn-link btn-sm mb-2">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </t>
+    </template>
+
+</odoo>

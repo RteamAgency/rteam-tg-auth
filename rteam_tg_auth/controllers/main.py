@@ -1,24 +1,157 @@
-"""Webhook receiver for the Telegram bot.
+"""HTTP entry points for rteam_tg_auth.
 
-In v0.1 the only update kind we care about is ``message`` with text
-``/start <bind_token>`` -- the second leg of the bind handshake started
-by the Bind Telegram wizard. Other update kinds are accepted with 200 OK
-and ignored so Telegram does not retry them.
+Two routes:
 
-Auth: the per-instance secret is in the URL path AND in the
+1. ``/rteam_tg_auth/webhook/<secret>`` -- receives Telegram bot updates.
+   Used for the bind handshake (``/start <bind_token>``).
+2. ``/web/login/rteam_tg`` -- the second-step login form for users with
+   Telegram 2FA enabled. Mirrors the auth_totp ``/web/login/totp``
+   pattern: reads ``request.session['pre_uid']`` set by the framework
+   after password verification, sends a 6-digit code to the user's bound
+   chat, accepts the code on POST, finalizes the session.
+
+Webhook auth: the per-instance secret is in the URL path AND in the
 ``X-Telegram-Bot-Api-Secret-Token`` header (Telegram echoes whatever we
 passed via setWebhook). Both are validated.
 """
 
 import json
 import logging
+import re
 
 from odoo import _, fields, http
+from odoo.addons.web.controllers import home as web_home
+from odoo.exceptions import AccessDenied, UserError
 from odoo.http import request
 
 from ..models.telegram_api import TelegramApiError, send_message
 
 _logger = logging.getLogger(__name__)
+
+
+class RteamTgLoginHome(web_home.Home):
+    @http.route(
+        "/web/login/rteam_tg",
+        type="http",
+        auth="public",
+        methods=["GET", "POST"],
+        sitemap=False,
+        website=True,
+        multilang=False,
+    )
+    def web_login_rteam_tg(self, redirect=None, **kwargs):
+        # Already authenticated -> bounce to wherever the redirect points.
+        if request.session.uid:
+            return request.redirect(self._login_redirect(request.session.uid, redirect=redirect))
+
+        # No pre-auth in session means the user landed here directly without
+        # going through /web/login first. Send them back to the password page.
+        if not request.session.get("pre_uid"):
+            return request.redirect("/web/login")
+
+        user = request.env["res.users"].sudo().browse(request.session["pre_uid"])
+        binding = user.tg_binding_id[:1]
+        ip = request.httprequest.environ.get("REMOTE_ADDR")
+        user_agent = request.httprequest.headers.get("User-Agent")
+
+        info = None
+        error = None
+
+        if request.httprequest.method == "GET":
+            # First GET (or refresh): if we don't already have a fresh code
+            # in flight, send one.
+            if binding and binding.state == "active":
+                try:
+                    sent = binding.issue_challenge(ip=ip, user_agent=user_agent)
+                    info = (
+                        _("A 6-digit code was just sent to your Telegram chat.")
+                        if sent
+                        else _("Use the most recent code sent to your Telegram chat.")
+                    )
+                except UserError as e:
+                    error = str(e)
+            else:
+                error = _(
+                    "This account is no longer bound to Telegram. Contact your administrator."
+                )
+            request.session.touch()
+            return request.render(
+                "rteam_tg_auth.tg_login_form",
+                {
+                    "user": user,
+                    "info": info,
+                    "error": error,
+                    "redirect": redirect,
+                    "bot_username": request.env["ir.config_parameter"]
+                    .sudo()
+                    .get_param("rteam_tg_auth.bot_username")
+                    or "",
+                },
+            )
+
+        # POST: action is either "verify" (default) or "resend".
+        action = (kwargs.get("action") or "verify").lower()
+
+        if action == "resend":
+            if binding and binding.state == "active":
+                try:
+                    binding.write({"pending_code_hash": False, "pending_code_expires_at": False})
+                    binding.issue_challenge(ip=ip, user_agent=user_agent)
+                    info = _("A new 6-digit code was just sent to your Telegram chat.")
+                except UserError as e:
+                    error = str(e)
+            request.session.touch()
+            return request.render(
+                "rteam_tg_auth.tg_login_form",
+                {
+                    "user": user,
+                    "info": info,
+                    "error": error,
+                    "redirect": redirect,
+                    "bot_username": request.env["ir.config_parameter"]
+                    .sudo()
+                    .get_param("rteam_tg_auth.bot_username")
+                    or "",
+                },
+            )
+
+        # action == "verify"
+        token = re.sub(r"\s", "", kwargs.get("rteam_tg_token") or "")
+        if not token:
+            error = _("Enter the 6-digit code from Telegram.")
+        else:
+            try:
+                with user._assert_can_auth(user=user.id):
+                    user._check_credentials(
+                        {"type": "rteam_tg", "token": token},
+                        {"interactive": True},
+                    )
+            except AccessDenied as e:
+                error = str(e)
+            else:
+                request.session.finalize(request.env)
+                request.update_env(user=request.session.uid)
+                request.update_context(**request.session.context)
+                response = request.redirect(
+                    self._login_redirect(request.session.uid, redirect=redirect)
+                )
+                request.session.touch()
+                return response
+
+        request.session.touch()
+        return request.render(
+            "rteam_tg_auth.tg_login_form",
+            {
+                "user": user,
+                "info": info,
+                "error": error,
+                "redirect": redirect,
+                "bot_username": request.env["ir.config_parameter"]
+                .sudo()
+                .get_param("rteam_tg_auth.bot_username")
+                or "",
+            },
+        )
 
 
 class RteamTgAuthController(http.Controller):
