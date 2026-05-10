@@ -143,3 +143,79 @@ class TestBindingChallenge(TransactionCase):
         self.binding.pending_code_hash = False
         self.binding.pending_code_expires_at = False
         self.assertFalse(self.binding.verify_challenge("123456"))
+
+
+class TestRecoveryCodes(TransactionCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.params = cls.env["ir.config_parameter"].sudo()
+        cls.params.set_param("rteam_tg_auth.bot_token", "TEST_TOKEN")
+        cls.user = cls.env["res.users"].create({"name": "Recovery U", "login": "recovery_user_t1b"})
+        cls.binding = cls.env["rteam.tg.binding"].create(
+            {
+                "user_id": cls.user.id,
+                "state": "active",
+                "chat_id": "777777",
+                "bound_at": fields.Datetime.now(),
+            }
+        )
+
+    def test_generate_returns_ten_unique_codes_and_stores_hashes(self):
+        codes = self.binding.generate_recovery_codes()
+        self.assertEqual(len(codes), 10)
+        self.assertEqual(len(set(codes)), 10, "codes must be unique")
+        self.assertEqual(self.binding.recovery_codes_remaining(), 10)
+        # Plain codes never persisted -- only hashes.
+        for plain in codes:
+            self.assertNotIn(plain, self.binding.recovery_codes or "")
+
+    def test_generate_refuses_when_not_active(self):
+        self.binding.state = "pending"
+        with self.assertRaises(UserError):
+            self.binding.generate_recovery_codes()
+
+    def test_recovery_code_consumed_on_first_use(self):
+        codes = self.binding.generate_recovery_codes()
+        ok = self.binding.verify_challenge(codes[0])
+        self.assertTrue(ok)
+        self.assertEqual(self.binding.recovery_codes_remaining(), 9)
+        # Same code rejected the second time.
+        self.assertFalse(self.binding.verify_challenge(codes[0]))
+
+    def test_recovery_code_normalization(self):
+        codes = self.binding.generate_recovery_codes()
+        c = codes[0]
+        # Strip dashes, lowercase, surround with whitespace -- still works.
+        smudged = " " + c.replace("-", "").lower() + " "
+        self.assertTrue(self.binding.verify_challenge(smudged))
+
+    def test_unknown_recovery_code_is_rejected(self):
+        self.binding.generate_recovery_codes()
+        # 12 chars from valid alphabet but not a generated code.
+        from odoo.addons.rteam_tg_auth.models.rteam_tg_binding import RECOVERY_ALPHABET
+
+        unknown = (
+            (RECOVERY_ALPHABET[0] * 4)
+            + "-"
+            + (RECOVERY_ALPHABET[1] * 4)
+            + "-"
+            + (RECOVERY_ALPHABET[2] * 4)
+        )
+        self.assertFalse(self.binding.verify_challenge(unknown))
+        self.assertEqual(self.binding.recovery_codes_remaining(), 10)
+
+    def test_six_digit_pending_code_still_takes_priority(self):
+        # Recovery codes exist AND there's a fresh 6-digit code: the
+        # 6-digit code path must still work and not be misrouted.
+        self.binding.generate_recovery_codes()
+        self.binding.write(
+            {
+                "pending_code_hash": self.binding._hash_code("424242"),
+                "pending_code_expires_at": fields.Datetime.now() + timedelta(seconds=60),
+            }
+        )
+        self.assertTrue(self.binding.verify_challenge("424242"))
+        # Code consumed, no recovery code used.
+        self.assertFalse(self.binding.pending_code_hash)
+        self.assertEqual(self.binding.recovery_codes_remaining(), 10)

@@ -1,6 +1,6 @@
 {
     "name": "Rteam Telegram Approvals & 2FA",
-    "version": "19.0.2.0.3",
+    "version": "19.0.2.1.0",
     "category": "Productivity",
     "summary": "Approve POs, invoices and more from Telegram with one tap. Login 2FA included.",
     "description": """
@@ -90,6 +90,7 @@ follow on the ``17.0`` and ``18.0`` branches.
         "security/ir.model.access.csv",
         "data/ir_config_parameter_data.xml",
         "wizard/rteam_tg_bind_wizard_views.xml",
+        "wizard/rteam_tg_recovery_codes_wizard_views.xml",
         "views/rteam_tg_binding_views.xml",
         "views/rteam_tg_audit_views.xml",
         "views/rteam_tg_approval_views.xml",

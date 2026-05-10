@@ -33,12 +33,17 @@ class ResUsers(models.Model):
         compute="_compute_tg_2fa_state",
         store=False,
     )
+    tg_recovery_codes_remaining = fields.Integer(
+        compute="_compute_tg_2fa_state",
+        store=False,
+    )
 
-    @api.depends("tg_binding_id.state")
+    @api.depends("tg_binding_id.state", "tg_binding_id.recovery_codes")
     def _compute_tg_2fa_state(self):
         for user in self:
             binding = user.tg_binding_id[:1]
             user.tg_2fa_state = binding.state if binding else "none"
+            user.tg_recovery_codes_remaining = binding.recovery_codes_remaining() if binding else 0
 
     # ---------------------------------------------------------------- MFA
 
@@ -201,6 +206,17 @@ class ResUsers(models.Model):
             "target": "new",
             "context": dict(self.env.context, default_bot_username=bot_username),
         }
+
+    def action_rteam_tg_generate_recovery(self):
+        """Open a one-shot wizard with 10 fresh recovery codes for this user."""
+        self.ensure_one()
+        Binding = self.env["rteam.tg.binding"].sudo()
+        binding = Binding.search([("user_id", "=", self.id)], limit=1)
+        if not binding or binding.state != "active":
+            raise UserError(
+                _("Bind Telegram first; recovery codes only make sense for an active binding.")
+            )
+        return self.env["rteam.tg.recovery.codes.wizard"].render_for_binding(binding)
 
     def action_rteam_tg_unbind(self):
         """Revoke the user's binding. Hard-deletes the row; audit log keeps the trail."""

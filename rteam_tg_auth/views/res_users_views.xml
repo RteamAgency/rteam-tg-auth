@@ -11,6 +11,9 @@
                 <page string="Telegram 2FA" name="rteam_tg_2fa">
                     <group>
                         <field name="tg_2fa_state"/>
+                        <field name="tg_recovery_codes_remaining"
+                               string="Recovery codes left"
+                               invisible="tg_2fa_state != 'active'"/>
                     </group>
                     <div class="mt-2 mb-3">
                         <button name="action_rteam_tg_bind"
@@ -19,6 +22,13 @@
                                 class="btn-primary"
                                 icon="fa-telegram"
                                 invisible="tg_2fa_state == 'active'"/>
+                        <button name="action_rteam_tg_generate_recovery"
+                                type="object"
+                                string="Generate recovery codes"
+                                class="btn-secondary"
+                                icon="fa-key"
+                                confirm="Generating fresh codes invalidates the current set. Continue?"
+                                invisible="tg_2fa_state != 'active'"/>
                         <button name="action_rteam_tg_unbind"
                                 type="object"
                                 string="Unbind"
@@ -56,6 +66,9 @@
                 <page string="Telegram 2FA" name="rteam_tg_2fa">
                     <group>
                         <field name="tg_2fa_state"/>
+                        <field name="tg_recovery_codes_remaining"
+                               string="Recovery codes left"
+                               invisible="tg_2fa_state != 'active'"/>
                     </group>
                     <div class="mt-2 mb-3">
                         <button name="action_rteam_tg_bind"
@@ -64,6 +77,13 @@
                                 class="btn-primary"
                                 icon="fa-telegram"
                                 invisible="tg_2fa_state == 'active'"/>
+                        <button name="action_rteam_tg_generate_recovery"
+                                type="object"
+                                string="Generate recovery codes"
+                                class="btn-secondary"
+                                icon="fa-key"
+                                confirm="Generating fresh codes invalidates the current set. Continue?"
+                                invisible="tg_2fa_state != 'active'"/>
                         <button name="action_rteam_tg_unbind"
                                 type="object"
                                 string="Unbind"

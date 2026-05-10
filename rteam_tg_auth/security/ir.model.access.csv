@@ -3,5 +3,6 @@ access_rteam_tg_binding_user,rteam.tg.binding.user,model_rteam_tg_binding,group_
 access_rteam_tg_binding_admin,rteam.tg.binding.admin,model_rteam_tg_binding,group_rteam_tg_admin,1,1,1,1
 access_rteam_tg_audit_admin,rteam.tg.audit.admin,model_rteam_tg_audit,group_rteam_tg_admin,1,0,0,0
 access_rteam_tg_bind_wizard_user,rteam.tg.bind.wizard.user,model_rteam_tg_bind_wizard,base.group_user,1,1,1,1
+access_rteam_tg_recovery_codes_wizard_user,rteam.tg.recovery.codes.wizard.user,model_rteam_tg_recovery_codes_wizard,base.group_user,1,1,1,1
 access_rteam_tg_approval_user,rteam.tg.approval.request.user,model_rteam_tg_approval_request,group_rteam_tg_user,1,0,0,0
 access_rteam_tg_approval_admin,rteam.tg.approval.request.admin,model_rteam_tg_approval_request,group_rteam_tg_admin,1,1,1,1

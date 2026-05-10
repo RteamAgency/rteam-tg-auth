@@ -22,6 +22,13 @@ DEFAULT_CODE_ATTEMPT_LIMIT = 5
 DEFAULT_RATE_LIMIT_WINDOW = 900  # seconds
 DEFAULT_RATE_LIMIT_MAX = 5
 
+# Alphabet for recovery codes: skip ambiguous I/O/0/1 so codes are
+# legible across fonts and easy to dictate over a phone call.
+RECOVERY_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+RECOVERY_GROUP_LEN = 4
+RECOVERY_GROUPS = 3  # XXXX-XXXX-XXXX
+RECOVERY_CODE_COUNT = 10
+
 
 class RteamTgBinding(models.Model):
     _name = "rteam.tg.binding"
@@ -126,6 +133,73 @@ class RteamTgBinding(models.Model):
     @staticmethod
     def _hash_code(code):
         return hashlib.sha256(code.encode("utf-8")).hexdigest()
+
+    @staticmethod
+    def _normalize_recovery_code(value):
+        """Strip whitespace + dashes + lowercase noise so users can type
+        ``abcd efgh ijkl`` or ``ABCDEFGHIJKL`` and we still recognize it
+        against ``ABCD-EFGH-IJKL`` storage."""
+        if not value:
+            return ""
+        return "".join(c for c in value.upper() if c in RECOVERY_ALPHABET)
+
+    @staticmethod
+    def _format_recovery_code(raw):
+        """Insert dashes every RECOVERY_GROUP_LEN characters."""
+        return "-".join(
+            raw[i : i + RECOVERY_GROUP_LEN] for i in range(0, len(raw), RECOVERY_GROUP_LEN)
+        )
+
+    # ---------------------------------------------------------------- recovery
+
+    def generate_recovery_codes(self):
+        """Generate ``RECOVERY_CODE_COUNT`` fresh codes, replace any prior set.
+
+        Returns the list of plain-text codes -- the caller MUST show these
+        to the user once; only the SHA-256 hashes survive on the binding.
+        """
+        self.ensure_one()
+        if self.state != "active":
+            raise UserError(
+                _("Bind Telegram first; recovery codes only make sense for an active binding.")
+            )
+        plain_codes = []
+        hashes = []
+        for _i in range(RECOVERY_CODE_COUNT):
+            raw = "".join(
+                secrets.choice(RECOVERY_ALPHABET)
+                for _j in range(RECOVERY_GROUP_LEN * RECOVERY_GROUPS)
+            )
+            plain_codes.append(self._format_recovery_code(raw))
+            hashes.append(self._hash_code(raw))
+        self.sudo().write({"recovery_codes": "\n".join(hashes)})
+        return plain_codes
+
+    def _verify_recovery_code(self, submitted):
+        """Try the submitted value as a recovery code; consume on match."""
+        self.ensure_one()
+        normalized = self._normalize_recovery_code(submitted)
+        if not normalized or not self.recovery_codes:
+            return False
+        target = self._hash_code(normalized)
+        kept = []
+        matched = False
+        for stored in (self.recovery_codes or "").splitlines():
+            stored = stored.strip()
+            if not stored:
+                continue
+            if not matched and stored == target:
+                matched = True  # consume one code
+                continue
+            kept.append(stored)
+        if not matched:
+            return False
+        self.sudo().write({"recovery_codes": "\n".join(kept)})
+        return True
+
+    def recovery_codes_remaining(self):
+        self.ensure_one()
+        return sum(1 for line in (self.recovery_codes or "").splitlines() if line.strip())
 
     # ------------------------------------------------------------- challenge
 
@@ -238,16 +312,40 @@ class RteamTgBinding(models.Model):
         return True
 
     def verify_challenge(self, submitted_code, ip=None, user_agent=None):
-        """Return True if ``submitted_code`` matches the live pending code.
+        """Return True if ``submitted_code`` matches the live pending code,
+        OR a stored recovery code (consumed on match).
 
-        On success, clears the pending code so it cannot be reused.
-        On failure, increments attempts and clears the pending code once the
-        attempt limit is hit so the next try forces a fresh code.
+        Pending-code path: on success clears the pending code; on failure
+        increments attempts and invalidates the code after the attempt
+        limit. Recovery path: tries when no live pending code OR when the
+        pending check fails. Recovery codes are single-use and cleared
+        from the stored set on consume.
         """
         self.ensure_one()
         if not submitted_code:
             return False
         normalized = submitted_code.strip()
+
+        # Recovery code is dash-grouped, longer than 6 digits, and not
+        # purely numeric. Try the recovery path first when the input
+        # shape clearly is not a 6-digit code.
+        looks_like_recovery = len(normalized) > 6 or any(
+            not c.isdigit() and c not in "- " for c in normalized
+        )
+        if looks_like_recovery and self._verify_recovery_code(normalized):
+            self.sudo().write({"last_used_at": fields.Datetime.now()})
+            self.env["rteam.tg.audit"].sudo().create(
+                {
+                    "user_id": self.user_id.id,
+                    "binding_id": self.id,
+                    "event": "recovery_used",
+                    "ip": ip,
+                    "user_agent": user_agent,
+                    "note": f"Recovery codes remaining: {self.recovery_codes_remaining()}",
+                }
+            )
+            return True
+
         if not self._is_pending_code_fresh():
             self.env["rteam.tg.audit"].sudo().create(
                 {

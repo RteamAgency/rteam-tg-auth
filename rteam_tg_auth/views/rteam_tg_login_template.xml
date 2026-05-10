@@ -32,10 +32,13 @@
                                name="rteam_tg_token"
                                class="form-control mb-2"
                                autocomplete="off"
-                               inputmode="numeric"
                                autofocus="autofocus"
                                required="required"
-                               placeholder="e.g. 123456"/>
+                               placeholder="e.g. 123456 or ABCD-EFGH-IJKL"/>
+                        <small class="text-muted">
+                            Lost access to Telegram? Use one of your recovery codes
+                            (single-use, the dashes are optional).
+                        </small>
                     </div>
 
                     <div class="clearfix oe_login_buttons text-center d-grid mb-1">
