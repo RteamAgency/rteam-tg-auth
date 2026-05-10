@@ -67,6 +67,31 @@ class PurchaseOrder(models.Model):
             return False
         return approver
 
+    def _rteam_tg_gate_skip_reason(self):
+        """If this PO was a gating CANDIDATE (amount >= threshold AND an
+        approver is configured) but the gate decided to skip, return a
+        short human-readable reason. Otherwise return None.
+
+        Called from ``button_confirm`` so we can post a chatter note
+        explaining why no Telegram message went out -- the most common
+        confusion in testing is "I'm both the approver and the requester,
+        so the gate self-skipped silently".
+        """
+        self.ensure_one()
+        threshold, approver = self._rteam_tg_purchase_settings()
+        if not approver or not approver.exists():
+            return None
+        if self.amount_total < threshold:
+            return None
+        if approver.id == self.env.user.id:
+            return _(
+                "No Telegram approval was requested: you are configured as "
+                "the approver, and the gate skips self-approvals. To test "
+                "the flow, confirm the order as a different user, or change "
+                "the approver in Settings -> Telegram 2FA."
+            )
+        return None
+
     # ---------------------------------------------------------------- override
 
     def button_confirm(self):
@@ -78,18 +103,27 @@ class PurchaseOrder(models.Model):
         """
         gated_orders = self.env["purchase.order"]
         passthrough_orders = self.env["purchase.order"]
+        skip_reasons = {}  # po.id -> reason str
         for order in self:
             approver = order._rteam_tg_should_gate()
             if approver:
                 gated_orders |= order
             else:
                 passthrough_orders |= order
+                reason = order._rteam_tg_gate_skip_reason()
+                if reason:
+                    skip_reasons[order.id] = reason
 
         result = (
             super(PurchaseOrder, passthrough_orders).button_confirm()
             if passthrough_orders
             else True
         )
+
+        for order in passthrough_orders:
+            reason = skip_reasons.get(order.id)
+            if reason:
+                order.message_post(body=reason, subtype_xmlid="mail.mt_note")
 
         for order in gated_orders:
             existing = order.rteam_tg_pending_request_id

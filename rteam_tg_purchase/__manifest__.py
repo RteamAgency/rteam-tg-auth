@@ -1,6 +1,6 @@
 {
     "name": "Rteam Telegram Approvals: Purchase Orders",
-    "version": "19.0.1.0.2",
+    "version": "19.0.1.0.3",
     "category": "Purchases",
     "summary": "One-tap Purchase Order approvals in Telegram. CEO/CFO sign-off from a phone, anywhere.",
     "description": """

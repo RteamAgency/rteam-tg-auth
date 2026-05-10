@@ -95,6 +95,34 @@ class TestPurchaseGate(TransactionCase):
         po.refresh()
         self.assertEqual(po.state, "purchase")
 
+    def test_self_approve_posts_explanation_to_chatter(self):
+        # Same scenario as above, but assert that the gate explains
+        # itself to the chatter so the user does not wonder why no
+        # Telegram message arrived.
+        self._set_gate(threshold=10, approver_id=self.requester.id)
+        po = self._po(qty=10, price=100.0)
+        with self._patched_tg():
+            po.with_user(self.requester).button_confirm()
+        msgs = self.env["mail.message"].search(
+            [("model", "=", "purchase.order"), ("res_id", "=", po.id)]
+        )
+        bodies = " ".join(m.body or "" for m in msgs)
+        self.assertIn("self-approval", bodies)
+
+    def test_below_threshold_posts_no_skip_explanation(self):
+        # Below-threshold orders should NOT spam the chatter with a
+        # "no approval requested" note -- silence is correct here.
+        self._set_gate(threshold=10000, approver_id=self.approver.id)
+        po = self._po(qty=1, price=100.0)
+        with self._patched_tg():
+            po.with_user(self.requester).button_confirm()
+        msgs = self.env["mail.message"].search(
+            [("model", "=", "purchase.order"), ("res_id", "=", po.id)]
+        )
+        bodies = " ".join(m.body or "" for m in msgs)
+        self.assertNotIn("self-approval", bodies)
+        self.assertNotIn("No Telegram approval", bodies)
+
     # --------------------------------------------------------------- gated
 
     def test_above_threshold_creates_pending_request_and_holds_state(self):
