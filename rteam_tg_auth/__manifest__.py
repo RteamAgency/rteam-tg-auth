@@ -1,6 +1,6 @@
 {
     "name": "Rteam Telegram 2FA",
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.1.0",
     "category": "Administration",
     "summary": "Two-factor authentication for Odoo logins via your own Telegram bot",
     "description": """
@@ -56,6 +56,7 @@ follow on the ``17.0`` and ``18.0`` branches.
         "security/rteam_tg_auth_security.xml",
         "security/ir.model.access.csv",
         "data/ir_config_parameter_data.xml",
+        "wizard/rteam_tg_bind_wizard_views.xml",
         "views/rteam_tg_binding_views.xml",
         "views/rteam_tg_audit_views.xml",
         "views/res_users_views.xml",

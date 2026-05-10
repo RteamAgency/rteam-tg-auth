@@ -7,6 +7,11 @@
             <field name="value">False</field>
         </record>
 
+        <record id="param_bind_token_ttl_seconds" model="ir.config_parameter">
+            <field name="key">rteam_tg_auth.bind_token_ttl_seconds</field>
+            <field name="value">600</field>
+        </record>
+
         <record id="param_code_ttl_seconds" model="ir.config_parameter">
             <field name="key">rteam_tg_auth.code_ttl_seconds</field>
             <field name="value">300</field>

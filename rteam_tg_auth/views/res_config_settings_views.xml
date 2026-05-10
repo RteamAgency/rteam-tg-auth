@@ -28,7 +28,16 @@
                     <block title="Webhook" name="rteam_tg_webhook">
                         <setting id="rteam_tg_webhook_setting" string="Public URL" help="Required for the webhook-based bind handshake. Leave empty to use the manual chat_id fallback instead.">
                             <field name="rteam_tg_webhook_base_url" placeholder="https://mycompany.odoo.com"/>
-                            <field name="rteam_tg_webhook_secret"/>
+                            <div class="mt-2">
+                                <field name="rteam_tg_webhook_secret" readonly="1" placeholder="(generated when you click Register Webhook)"/>
+                            </div>
+                            <div class="mt-2">
+                                <button name="action_rteam_tg_register_webhook"
+                                        type="object"
+                                        string="Register Webhook"
+                                        class="btn-primary"
+                                        icon="fa-link"/>
+                            </div>
                         </setting>
                     </block>
 

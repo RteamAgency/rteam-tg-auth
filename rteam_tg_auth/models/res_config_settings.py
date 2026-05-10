@@ -1,9 +1,11 @@
 """Per-company Telegram bot configuration."""
 
+import secrets
+
 from odoo import _, fields, models
 from odoo.exceptions import UserError
 
-from .telegram_api import TelegramApiError, get_me
+from .telegram_api import TelegramApiError, get_me, set_webhook
 
 
 class ResConfigSettings(models.TransientModel):
@@ -67,6 +69,49 @@ class ResConfigSettings(models.TransientModel):
                     "Telegram accepted the token. Bot: @%(username)s (id %(id)s).",
                     username=username,
                     id=bot.get("id"),
+                ),
+                "next": {"type": "ir.actions.act_window_close"},
+            },
+        }
+
+    def action_rteam_tg_register_webhook(self):
+        """Register this Odoo instance as the bot's webhook receiver.
+
+        Generates a webhook secret if one isn't already set, then calls
+        ``setWebhook`` on Telegram with both the URL secret (in the path)
+        and the header secret (``X-Telegram-Bot-Api-Secret-Token``). Both
+        are validated by our controller.
+        """
+        self.ensure_one()
+        self.execute()
+        params = self.env["ir.config_parameter"].sudo()
+        token = params.get_param("rteam_tg_auth.bot_token")
+        base_url = (params.get_param("rteam_tg_auth.webhook_base_url") or "").rstrip("/")
+        if not token:
+            raise UserError(_("Set the bot token first, then click Validate."))
+        if not base_url:
+            raise UserError(_("Set the Public Base URL first (e.g. https://mycompany.odoo.com)."))
+        if not base_url.startswith("https://"):
+            raise UserError(_("Telegram requires the webhook URL to use HTTPS."))
+        secret = params.get_param("rteam_tg_auth.webhook_secret")
+        if not secret:
+            secret = secrets.token_hex(16)
+            params.set_param("rteam_tg_auth.webhook_secret", secret)
+        url = f"{base_url}/rteam_tg_auth/webhook/{secret}"
+        try:
+            set_webhook(token, url, secret_token=secret)
+        except TelegramApiError as e:
+            raise UserError(_("Telegram refused the webhook:\n\n%(err)s", err=str(e))) from e
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "type": "success",
+                "sticky": False,
+                "title": _("Webhook registered"),
+                "message": _(
+                    "Telegram will now POST updates to %(url)s.",
+                    url=url,
                 ),
                 "next": {"type": "ir.actions.act_window_close"},
             },

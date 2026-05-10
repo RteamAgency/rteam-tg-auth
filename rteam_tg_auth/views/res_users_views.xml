@@ -10,16 +10,31 @@
                 <page string="Telegram 2FA" name="rteam_tg_2fa">
                     <group>
                         <field name="tg_2fa_state"/>
-                        <field name="tg_binding_id" readonly="1">
-                            <list>
-                                <field name="state" widget="badge"/>
-                                <field name="tg_username"/>
-                                <field name="chat_id"/>
-                                <field name="bound_at"/>
-                                <field name="last_used_at"/>
-                            </list>
-                        </field>
                     </group>
+                    <div class="mt-2 mb-3">
+                        <button name="action_rteam_tg_bind"
+                                type="object"
+                                string="Bind Telegram"
+                                class="btn-primary"
+                                icon="fa-telegram"
+                                invisible="tg_2fa_state == 'active'"/>
+                        <button name="action_rteam_tg_unbind"
+                                type="object"
+                                string="Unbind"
+                                class="btn-secondary"
+                                icon="fa-unlink"
+                                confirm="Remove the Telegram binding for this user? Recovery codes (if generated) will be lost."
+                                invisible="tg_2fa_state == 'none'"/>
+                    </div>
+                    <field name="tg_binding_id" readonly="1">
+                        <list>
+                            <field name="state" widget="badge"/>
+                            <field name="tg_username"/>
+                            <field name="chat_id"/>
+                            <field name="bound_at"/>
+                            <field name="last_used_at"/>
+                        </list>
+                    </field>
                 </page>
             </xpath>
         </field>

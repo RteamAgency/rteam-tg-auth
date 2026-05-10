@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_rteam_tg_bind_wizard_form" model="ir.ui.view">
+        <field name="name">rteam.tg.bind.wizard.form</field>
+        <field name="model">rteam.tg.bind.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Bind Telegram">
+                <sheet>
+                    <div class="oe_title">
+                        <h2>Bind your Telegram</h2>
+                        <p>
+                            Click the button below. Telegram will open with a one-time
+                            command pre-filled. Press <strong>Send</strong> in Telegram
+                            and the bot will confirm the binding.
+                        </p>
+                    </div>
+                    <group>
+                        <field name="user_id" readonly="1"/>
+                        <field name="bot_username" readonly="1"/>
+                        <field name="expires_at" readonly="1"/>
+                        <field name="binding_id" invisible="1"/>
+                        <field name="bind_token" invisible="1"/>
+                        <field name="deep_link" invisible="1"/>
+                    </group>
+                    <div class="text-center mt-3 mb-3">
+                        <button name="action_open_telegram"
+                                type="object"
+                                string="Open in Telegram"
+                                class="btn-primary btn-lg"
+                                icon="fa-telegram"/>
+                    </div>
+                    <div class="alert alert-info" role="alert">
+                        After you press Send in Telegram, click <strong>I sent it</strong>
+                        below to refresh this dialog. If the binding succeeded, the User
+                        Profile will now show <em>Telegram 2FA: Active</em>.
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_check_status"
+                            type="object"
+                            string="I sent it - refresh"
+                            class="btn-primary"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
