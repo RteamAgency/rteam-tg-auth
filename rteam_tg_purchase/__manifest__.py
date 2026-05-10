@@ -1,6 +1,6 @@
 {
     "name": "Rteam Telegram Approvals: Purchase Orders",
-    "version": "19.0.1.0.3",
+    "version": "19.0.1.0.4",
     "category": "Purchases",
     "summary": "One-tap Purchase Order approvals in Telegram. CEO/CFO sign-off from a phone, anywhere.",
     "description": """
@@ -64,6 +64,9 @@ model: ``on_rteam_tg_approval_resolved(request, new_state)``.
         "data/ir_config_parameter_data.xml",
         "views/purchase_order_views.xml",
         "views/res_config_settings_views.xml",
+    ],
+    "images": [
+        "static/description/banner.png",
     ],
     "installable": True,
     "application": False,
