@@ -8,23 +8,71 @@
         <field name="arch" type="xml">
             <xpath expr="//form" position="inside">
                 <app data-string="Telegram 2FA" string="Telegram 2FA" name="rteam_tg_auth" groups="rteam_tg_auth.group_rteam_tg_admin">
+
                     <block title="Bot" name="rteam_tg_bot">
                         <setting id="rteam_tg_bot_token_setting" string="Bot Token" help="Token issued by @BotFather. Stored in your database, never sent to Rteam.">
                             <field name="rteam_tg_bot_token" password="True"/>
-                            <field name="rteam_tg_bot_username" readonly="1"/>
+                            <div class="mt-2">
+                                <field name="rteam_tg_bot_username" readonly="1" placeholder="(unknown — click Validate)"/>
+                            </div>
+                            <div class="mt-2">
+                                <button name="action_rteam_tg_validate_token"
+                                        type="object"
+                                        string="Validate"
+                                        class="btn-primary"
+                                        icon="fa-check-circle"/>
+                            </div>
                         </setting>
                     </block>
+
                     <block title="Webhook" name="rteam_tg_webhook">
                         <setting id="rteam_tg_webhook_setting" string="Public URL" help="Required for the webhook-based bind handshake. Leave empty to use the manual chat_id fallback instead.">
                             <field name="rteam_tg_webhook_base_url" placeholder="https://mycompany.odoo.com"/>
                             <field name="rteam_tg_webhook_secret"/>
                         </setting>
                     </block>
+
                     <block title="Policy" name="rteam_tg_policy">
                         <setting id="rteam_tg_enforce_setting" string="Enforce 2FA on Login" help="When on, every bound user is challenged on login. Recommended off until you have validated the bot reaches your users.">
                             <field name="rteam_tg_enforce_2fa"/>
                         </setting>
                     </block>
+
+                    <block title="Other Rteam Apps" name="rteam_tg_cross_sell">
+                        <div class="content-group mt-2">
+                            <p class="text-muted">
+                                Free and paid Odoo modules from Rteam, all on
+                                <a href="https://apps.odoo.com/apps/modules/browse?author=Rteam" target="_blank">apps.odoo.com</a>.
+                            </p>
+                            <ul class="list-unstyled mb-0">
+                                <li>
+                                    <a href="https://apps.odoo.com/apps/modules/browse?search=rteam_ai_assistant" target="_blank">
+                                        <strong>Rteam AI Assistant</strong>
+                                    </a>
+                                    <span class="text-muted"> — chat with your Odoo from Telegram, in natural language. Free.</span>
+                                </li>
+                                <li>
+                                    <a href="https://apps.odoo.com/apps/modules/browse?search=rteam_health_check" target="_blank">
+                                        <strong>Rteam Daily Health Check</strong>
+                                    </a>
+                                    <span class="text-muted"> — daily report on cron failures, disk, Postgres health. Free.</span>
+                                </li>
+                                <li>
+                                    <a href="https://apps.odoo.com/apps/modules/browse?search=rteam_prozorro" target="_blank">
+                                        <strong>Rteam Prozorro Connector</strong>
+                                    </a>
+                                    <span class="text-muted"> — Ukrainian Prozorro tender feed into your CRM. Free.</span>
+                                </li>
+                                <li>
+                                    <a href="https://apps.odoo.com/apps/modules/browse?search=rteam_fsm_repair" target="_blank">
+                                        <strong>Rteam FSM Repair Bridge</strong>
+                                    </a>
+                                    <span class="text-muted"> — link Field Service tasks to Repair orders. Free.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </block>
+
                 </app>
             </xpath>
         </field>

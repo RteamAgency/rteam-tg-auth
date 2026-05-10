@@ -1,6 +1,9 @@
 """Per-company Telegram bot configuration."""
 
-from odoo import fields, models
+from odoo import _, fields, models
+from odoo.exceptions import UserError
+
+from .telegram_api import TelegramApiError, get_me
 
 
 class ResConfigSettings(models.TransientModel):
@@ -31,3 +34,40 @@ class ResConfigSettings(models.TransientModel):
         default=False,
         help="When enabled, every user with an active binding is challenged on login. Off by default for safe rollout.",
     )
+
+    def action_rteam_tg_validate_token(self):
+        """Call Telegram getMe to validate the configured bot token.
+
+        On success: writes back the bot username so it appears in the URL hint
+        on user binding pages, and returns a green sticky notification with
+        the bot identity. On failure: surfaces the API error verbatim so the
+        admin can act on it (bad token, no egress, Telegram down, etc.).
+        """
+        self.ensure_one()
+        # Persist current edits before talking to Telegram so the token used
+        # for the call matches what the admin sees in the form.
+        self.execute()
+        token = self.env["ir.config_parameter"].sudo().get_param("rteam_tg_auth.bot_token")
+        if not token:
+            raise UserError(_("Set the bot token first, then click Validate."))
+        try:
+            bot = get_me(token)
+        except TelegramApiError as e:
+            raise UserError(_("Telegram rejected the token:\n\n%(err)s", err=str(e))) from e
+        username = bot.get("username") or ""
+        self.env["ir.config_parameter"].sudo().set_param("rteam_tg_auth.bot_username", username)
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "type": "success",
+                "sticky": False,
+                "title": _("Bot connected"),
+                "message": _(
+                    "Telegram accepted the token. Bot: @%(username)s (id %(id)s).",
+                    username=username,
+                    id=bot.get("id"),
+                ),
+                "next": {"type": "ir.actions.act_window_close"},
+            },
+        }
