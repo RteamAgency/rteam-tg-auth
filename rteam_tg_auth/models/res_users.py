@@ -43,9 +43,16 @@ class ResUsers(models.Model):
     # ---------------------------------------------------------------- MFA
 
     def _rteam_tg_2fa_required(self):
-        """True when this user must complete a Telegram 2FA challenge to log in."""
+        """True when this user must complete a Telegram 2FA challenge to log in.
+
+        Short-circuits for the public and portal users -- they cannot have
+        a Telegram binding, AND they cannot traverse rteam.tg.binding by
+        ACL, so reading ``tg_2fa_state`` on them would 500 on /web/login.
+        """
         self.ensure_one()
-        if self.tg_2fa_state != "active":
+        if not self.sudo().has_group("base.group_user"):
+            return False
+        if self.sudo().tg_2fa_state != "active":
             return False
         enforce = (
             self.env["ir.config_parameter"].sudo().get_param("rteam_tg_auth.enforce_2fa", "False")
