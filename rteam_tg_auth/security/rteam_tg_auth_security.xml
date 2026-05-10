@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+    <!-- Group definitions and record rules: noupdate=1 so an admin's
+         downstream tweaks (e.g. tightening domain_force) survive a
+         module upgrade. -->
     <data noupdate="1">
 
         <record id="group_rteam_tg_user" model="res.groups">
@@ -11,15 +15,6 @@
             <field name="name">Telegram 2FA Administrator</field>
             <field name="comment">Can configure the bot, view audit log, and reset bindings for any user.</field>
             <field name="implied_ids" eval="[(4, ref('group_rteam_tg_user'))]"/>
-        </record>
-
-        <!-- Every employee can manage their own Telegram binding; every
-             system administrator can configure the bot and the audit log. -->
-        <record id="base.group_user" model="res.groups">
-            <field name="implied_ids" eval="[(4, ref('group_rteam_tg_user'))]"/>
-        </record>
-        <record id="base.group_system" model="res.groups">
-            <field name="implied_ids" eval="[(4, ref('group_rteam_tg_admin'))]"/>
         </record>
 
         <record id="rule_tg_binding_user_own" model="ir.rule">
@@ -37,4 +32,22 @@
         </record>
 
     </data>
+
+    <!-- Cross-grants on existing base groups: NO noupdate, so on every
+         module upgrade we re-confirm that every internal user gets the
+         Telegram 2FA User role and every system administrator gets the
+         Telegram 2FA Administrator role. The (4, ref) m2m op is
+         idempotent so re-applying is a no-op when already in place. -->
+    <data>
+
+        <record id="base.group_user" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('group_rteam_tg_user'))]"/>
+        </record>
+
+        <record id="base.group_system" model="res.groups">
+            <field name="implied_ids" eval="[(4, ref('group_rteam_tg_admin'))]"/>
+        </record>
+
+    </data>
+
 </odoo>
