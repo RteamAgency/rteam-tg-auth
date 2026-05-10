@@ -1,40 +1,73 @@
 {
-    "name": "Rteam Telegram 2FA",
-    "version": "19.0.2.0.0",
-    "category": "Administration",
-    "summary": "Two-factor authentication for Odoo logins via your own Telegram bot",
+    "name": "Rteam Telegram Approvals & 2FA",
+    "version": "19.0.2.0.1",
+    "category": "Productivity",
+    "summary": "Approve POs, invoices and more from Telegram with one tap. Login 2FA included.",
     "description": """
-Rteam Telegram 2FA
-==================
+Rteam Telegram Approvals & 2FA
+==============================
 
-Free Odoo module that adds Telegram-based two-factor authentication to Odoo
-user logins. Bring your own bot (created via @BotFather), paste the token
-into Settings, bind each user once, and Odoo will challenge logins with a
-6-digit code delivered to the user's Telegram chat.
+Approve Purchase Orders, Vendor Bills, Time Off and other Odoo records
+from Telegram with one tap. Bring your own bot (created via @BotFather)
+in 60 seconds, bind each approver to their Telegram chat, and the bot
+delivers Approve / Reject / View-in-Odoo buttons straight to their phone.
 
-Features
---------
-* Bring-your-own-bot: no third-party SaaS, no rteam.agency dependency at
-  runtime. The bot lives in your Telegram, the secret stays in your Odoo.
-* Per-user opt-in: 2FA is off by default; each user enables it after binding
-  their Telegram chat.
-* Outbound only by default: works on any Odoo deployment that can reach
-  api.telegram.org over HTTPS, including on-prem behind NAT.
-* Optional webhook for the bind handshake (for public-URL deployments such
-  as Odoo.sh) plus a manual chat_id fallback for sites without a public URL.
-* 10 single-use recovery codes generated on enrollment to avoid lockouts.
-* Audit log: bind, unbind, login challenge sent, code accepted/rejected,
-  recovery code used, admin reset; with IP, user agent, and Telegram message
-  id.
-* Rate limiting on code requests (5 per 15 minutes per user).
-* Admin reset flow for lost-phone scenarios, with audit trail.
+Two-factor authentication for Odoo logins is bundled in: the same bot
+that delivers approvals also delivers a 6-digit login code, no extra
+setup once the bot is configured.
 
-What this module does NOT do (yet)
-----------------------------------
-* Approval workflows (Purchase Orders, Vendor Bills, Time Off, Expenses).
-  Coming in a separate paid module ``rteam_tg_approvals``.
-* SMS or Email fallback channels.
-* WhatsApp parity.
+Why Telegram, not email or SMS
+------------------------------
+* One tap, no link to follow, no inbox to dig through. The Approve
+  button is the action.
+* Free outbound (Telegram Bot API costs nothing). Email approvals
+  bury the request in noise; SMS via Twilio costs ~$0.05 per message
+  and lacks inline buttons.
+* Push delivery your CEO/CFO already lives in. Telegram has 800M+
+  users in EU, MENA, UA, SEA -- the same regions where your Odoo
+  install is most likely deployed.
+
+Architecture in one paragraph
+-----------------------------
+Bring-your-own-bot. The token lives in your database, never in ours.
+The module talks outbound to ``api.telegram.org`` over HTTPS for
+notifications and 2FA codes. Telegram delivers user taps back to one
+webhook endpoint guarded by both a path secret and the
+``X-Telegram-Bot-Api-Secret-Token`` header. Each inline button carries
+HMAC-signed callback data so an attacker who learns a request id alone
+cannot forge a tap.
+
+What's in the box
+-----------------
+* Approval ledger (source-agnostic). State machine: pending -> approved
+  / rejected / expired / cancelled. Audit trail per request: who, when,
+  from which chat, with which Telegram message id.
+* Inline-button approval messages with three actions: Approve, Reject,
+  View in Odoo (deep-link).
+* 24-hour TTL on requests, configurable. Stale requests auto-expire on
+  a 30-minute cron.
+* Admin Approvals dashboard under Settings -> Telegram.
+* Two-factor login with 6-digit codes, 5-minute TTL, rate-limited
+  (5 requests per 15 min per user). Per-user opt-in, off by default,
+  global enforce switch when you are ready.
+* Bind wizard with one-tap deep link ``https://t.me/<bot>?start=<token>``.
+* Audit log for every Telegram-side event. CSV export ready.
+* No external Python dependencies (stdlib urllib only).
+* No third-party SaaS, no rteam.agency dependency at runtime.
+
+Source-model integrations
+-------------------------
+This module is the foundation. Source-side glue ships as separate
+modules so the core stays light:
+
+* ``rteam_tg_purchase`` -- Purchase Order approvals (free, this repo)
+* ``rteam_tg_invoice`` -- Vendor Bill approvals (planned)
+* ``rteam_tg_timeoff`` -- Time Off approvals (planned)
+* ``rteam_tg_expenses`` -- Expense Report approvals (planned)
+
+Building your own integration is one method on the source model:
+``on_rteam_tg_approval_resolved(request, new_state)``. The Telegram
+side is fully reusable.
 
 Targeted at Odoo 19 (Community and Enterprise). Backports to 17 and 18
 follow on the ``17.0`` and ``18.0`` branches.

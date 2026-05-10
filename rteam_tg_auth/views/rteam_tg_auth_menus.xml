@@ -2,7 +2,7 @@
 <odoo>
 
     <menuitem id="menu_rteam_tg_root"
-              name="Telegram 2FA"
+              name="Telegram"
               sequence="100"
               groups="rteam_tg_auth.group_rteam_tg_admin"
               web_icon="rteam_tg_auth,static/description/icon.png"/>

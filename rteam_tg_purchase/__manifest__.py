@@ -1,28 +1,57 @@
 {
-    "name": "Rteam Telegram Approvals -- Purchase",
-    "version": "19.0.1.0.0",
+    "name": "Rteam Telegram Approvals: Purchase Orders",
+    "version": "19.0.1.0.1",
     "category": "Purchases",
-    "summary": "Approve Purchase Orders from Telegram with one tap",
+    "summary": "One-tap Purchase Order approvals in Telegram. CEO/CFO sign-off from a phone, anywhere.",
     "description": """
-Rteam Telegram Approvals -- Purchase
-====================================
+Rteam Telegram Approvals: Purchase Orders
+=========================================
 
-Glue between ``rteam_tg_auth`` and the Odoo Purchase module. When a
-purchase order is confirmed and the order amount exceeds a configurable
-threshold, the order is held in a pending state and a Telegram message
-with Approve / Reject inline buttons is delivered to the configured
-approver. The approver's tap (validated by HMAC-signed callback_data,
-not just by request id) flips the order to confirmed or back to draft,
-and writes a chatter note + audit row.
+Stop chasing your CEO with "please confirm PO #1234". When a Purchase
+Order over your threshold is confirmed, an inline Telegram message
+goes straight to the approver's phone with three buttons: Approve,
+Reject, View in Odoo. One tap and the PO confirms in Odoo, the
+chatter records who approved and when. No VPN, no Odoo login, no
+inbox dig.
 
-Approver, threshold, and the per-source kill switch are all configured
-under Settings -> Telegram 2FA -> Purchase Approvals. The approver must
-already have an active Telegram binding from rteam_tg_auth.
+How it works
+------------
+1. Install this module on top of ``rteam_tg_auth``.
+2. The approver completes Bind Telegram once in their Odoo
+   Preferences (60 seconds via the deep link the bot sends them).
+3. Set Settings -> Telegram -> Purchase Approvals: a Threshold (the
+   amount above which approval is required) and a Default approver.
+4. From now on, when a Purchase Order at or above the threshold is
+   confirmed, the order is held in draft state and a Telegram
+   message with inline Approve / Reject buttons is delivered to the
+   configured approver. Their tap flips the order to confirmed or
+   leaves it in draft, and posts a chatter note linking the action
+   back to the approver and the time.
 
-This is the first source-model integration; the underlying ledger
-(``rteam.tg.approval.request``) is source-agnostic, so future sibling
-modules ``rteam_tg_invoice``, ``rteam_tg_timeoff``, etc. can plug in
-without duplicating the Telegram side.
+Security
+--------
+Each inline button carries an HMAC-signed callback payload. An
+attacker who learns a request id alone cannot forge a tap without
+the per-instance webhook secret. Telegram messages and webhook
+callbacks share the same path-and-header secret; the bot token
+never leaves your database.
+
+Reliability
+-----------
+* Stale requests (24h default) auto-expire on a 30-minute cron, with
+  a chatter note on the source PO.
+* Approver opens the same PO in Odoo? The header shows a "View
+  Telegram approval" button so they can see exactly which TG message
+  is in flight.
+* Re-confirming a PO with an open request raises a clear error
+  rather than spawning a duplicate.
+* Self-approve is blocked: requester == approver = no Telegram
+  detour, the order confirms normally.
+
+This is one of a planned family of source-model integrations on top
+of the same ``rteam_tg_auth`` ledger -- Vendor Bills, Time Off,
+Expenses are next. Building your own is one method on the source
+model: ``on_rteam_tg_approval_resolved(request, new_state)``.
 """,
     "author": "Rteam",
     "maintainer": "Rteam",

@@ -7,7 +7,7 @@
         <field name="inherit_id" ref="base.res_config_settings_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//form" position="inside">
-                <app data-string="Telegram 2FA" string="Telegram 2FA" name="rteam_tg_auth" groups="rteam_tg_auth.group_rteam_tg_admin">
+                <app data-string="Telegram" string="Telegram" name="rteam_tg_auth" groups="rteam_tg_auth.group_rteam_tg_admin">
 
                     <block title="Bot" name="rteam_tg_bot">
                         <setting id="rteam_tg_bot_token_setting" string="Bot Token" help="Token issued by @BotFather. Stored in your database, never sent to Rteam.">
@@ -41,8 +41,8 @@
                         </setting>
                     </block>
 
-                    <block title="Policy" name="rteam_tg_policy">
-                        <setting id="rteam_tg_enforce_setting" string="Enforce 2FA on Login" help="When on, every bound user is challenged on login. Recommended off until you have validated the bot reaches your users.">
+                    <block title="2FA on Login (optional)" name="rteam_tg_policy">
+                        <setting id="rteam_tg_enforce_setting" string="Enforce 2FA on Login" help="When on, every bound user is challenged with a 6-digit Telegram code on login. Recommended off until you have validated the bot reaches every user. Approvals work independently of this switch.">
                             <field name="rteam_tg_enforce_2fa"/>
                         </setting>
                     </block>
