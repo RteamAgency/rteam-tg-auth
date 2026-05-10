@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_rteam_tg_binding_user,rteam.tg.binding.user,model_rteam_tg_binding,group_rteam_tg_user,1,1,0,0
+access_rteam_tg_binding_admin,rteam.tg.binding.admin,model_rteam_tg_binding,group_rteam_tg_admin,1,1,1,1
+access_rteam_tg_audit_admin,rteam.tg.audit.admin,model_rteam_tg_audit,group_rteam_tg_admin,1,0,0,0

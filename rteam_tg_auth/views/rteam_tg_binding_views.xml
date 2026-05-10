@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_rteam_tg_binding_list" model="ir.ui.view">
+        <field name="name">rteam.tg.binding.list</field>
+        <field name="model">rteam.tg.binding</field>
+        <field name="arch" type="xml">
+            <list string="Telegram Bindings">
+                <field name="user_id"/>
+                <field name="tg_username"/>
+                <field name="state" decoration-success="state == 'active'" decoration-warning="state == 'pending'" decoration-muted="state == 'revoked'" widget="badge"/>
+                <field name="bound_at"/>
+                <field name="last_used_at"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rteam_tg_binding_form" model="ir.ui.view">
+        <field name="name">rteam.tg.binding.form</field>
+        <field name="model">rteam.tg.binding</field>
+        <field name="arch" type="xml">
+            <form string="Telegram Binding">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,active"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="tg_username"/>
+                            <field name="chat_id"/>
+                        </group>
+                        <group>
+                            <field name="bound_at"/>
+                            <field name="last_used_at"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rteam_tg_binding" model="ir.actions.act_window">
+        <field name="name">Telegram Bindings</field>
+        <field name="res_model">rteam.tg.binding</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+</odoo>

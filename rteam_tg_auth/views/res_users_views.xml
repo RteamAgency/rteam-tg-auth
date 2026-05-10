@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_users_form_tg_2fa" model="ir.ui.view">
+        <field name="name">res.users.form.rteam.tg.2fa</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Telegram 2FA" name="rteam_tg_2fa">
+                    <group>
+                        <field name="tg_2fa_state"/>
+                        <field name="tg_binding_id" readonly="1">
+                            <list>
+                                <field name="state" widget="badge"/>
+                                <field name="tg_username"/>
+                                <field name="chat_id"/>
+                                <field name="bound_at"/>
+                                <field name="last_used_at"/>
+                            </list>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

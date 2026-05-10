@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <menuitem id="menu_rteam_tg_root"
+              name="Telegram 2FA"
+              sequence="100"
+              groups="rteam_tg_auth.group_rteam_tg_admin"
+              web_icon="rteam_tg_auth,static/description/icon.png"/>
+
+    <menuitem id="menu_rteam_tg_bindings"
+              name="Bindings"
+              parent="menu_rteam_tg_root"
+              action="action_rteam_tg_binding"
+              sequence="10"/>
+
+    <menuitem id="menu_rteam_tg_audit"
+              name="Audit Log"
+              parent="menu_rteam_tg_root"
+              action="action_rteam_tg_audit"
+              sequence="20"/>
+
+    <menuitem id="menu_rteam_tg_settings"
+              name="Settings"
+              parent="menu_rteam_tg_root"
+              action="base_setup.action_general_configuration"
+              sequence="90"/>
+
+</odoo>
