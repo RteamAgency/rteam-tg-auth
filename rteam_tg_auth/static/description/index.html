@@ -1,0 +1,255 @@
+<section class="oe_container">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12" style="text-align:center;">
+      <h2 style="color:#0A1628;font-weight:700;letter-spacing:-0.02em;margin-top:24px;">
+        Approve POs from Telegram with one tap. CEO/CFO sign-off from a phone, anywhere.
+      </h2>
+      <h3 class="oe_slogan" style="color:#90A4B8;font-weight:400;margin-top:8px;">
+        Bring your own bot, no third-party SaaS, no Odoo VPN dance.
+        Two-factor login codes for free in the same channel.
+      </h3>
+      <p style="font-size:15px;color:#0A1628;font-weight:600;margin-top:18px;border:2px solid #00D4AA;border-radius:6px;display:inline-block;padding:8px 18px;">
+        First integration shipped: <strong>Purchase Orders</strong>.
+        Vendor Bills, Time Off, Expenses next.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container oe_dark">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <h2 style="color:#0A1628;font-weight:700;text-align:center;">What it does</h2>
+      <p style="font-size:16px;line-height:1.6;color:#333;max-width:780px;margin:0 auto;">
+        When a Purchase Order over your threshold is confirmed, the order is
+        held in draft state and an inline Telegram message goes straight to
+        the approver's phone with three buttons: <strong>Approve</strong>,
+        <strong>Reject</strong>, <strong>View in Odoo</strong>. One tap and
+        the PO confirms in Odoo, the chatter records who approved and when.
+        No VPN, no Odoo login, no inbox dig. The approver is back to their
+        coffee in 4 seconds.
+      </p>
+      <p style="font-size:14px;color:#666;text-align:center;margin-top:18px;">
+        <span style="display:inline-block;padding:4px 12px;background:#0A1628;color:#fff;border-radius:3px;font-family:monospace;font-size:12px;margin:2px;">Odoo 19</span>
+        <span style="display:inline-block;padding:4px 12px;background:#00D4AA;color:#0A1628;border-radius:3px;font-weight:bold;font-size:12px;margin:2px;">LGPL-3 Free</span>
+        <span style="display:inline-block;padding:4px 12px;background:#7C5CFC;color:#fff;border-radius:3px;font-size:12px;margin:2px;">Bring-your-own-bot</span>
+        <span style="display:inline-block;padding:4px 12px;background:#7C5CFC;color:#fff;border-radius:3px;font-size:12px;margin:2px;">No Python deps</span>
+        <span style="display:inline-block;padding:4px 12px;background:#0A1628;color:#fff;border-radius:3px;font-size:12px;margin:2px;">Community &amp; Enterprise</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12" style="text-align:center;">
+      <h2 style="color:#0A1628;font-weight:700;">From Odoo to a tap on a phone</h2>
+      <p style="font-size:15px;line-height:1.6;color:#333;max-width:780px;margin:0 auto 18px;">
+        The Purchase Order is held the moment it crosses the threshold. Your
+        approver sees an inline-button message; their tap drives the next
+        state of the PO and writes a chatter audit row.
+      </p>
+    </div>
+    <div class="oe_span12" style="text-align:center;">
+      <img src="screenshots/01_telegram_approval.png" alt="Telegram inline message with Approve / Reject / View in Odoo buttons on a Purchase Order"
+           style="max-width:100%;border:1px solid #e0e0e0;border-radius:4px;"/>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container oe_dark">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <h2 style="color:#0A1628;font-weight:700;text-align:center;">5-minute setup</h2>
+    </div>
+  </div>
+  <div class="oe_row oe_spaced">
+    <div class="oe_span4" style="text-align:center;">
+      <div style="width:64px;height:64px;background:#7C5CFC;color:#fff;border-radius:50%;font-size:28px;font-weight:bold;line-height:64px;margin:0 auto 12px;">1</div>
+      <h4 style="color:#0A1628;">Create a bot in 60 seconds</h4>
+      <p style="font-size:14px;line-height:1.5;color:#333;">
+        Talk to <a href="https://t.me/BotFather" style="color:#7C5CFC;">@BotFather</a> in Telegram, type <code>/newbot</code>, give it a name, copy the token.
+      </p>
+    </div>
+    <div class="oe_span4" style="text-align:center;">
+      <div style="width:64px;height:64px;background:#7C5CFC;color:#fff;border-radius:50%;font-size:28px;font-weight:bold;line-height:64px;margin:0 auto 12px;">2</div>
+      <h4 style="color:#0A1628;">Paste &amp; validate</h4>
+      <p style="font-size:14px;line-height:1.5;color:#333;">
+        Settings -&gt; Telegram. Paste the token, click <strong>Validate</strong>. Then enter your public URL and click <strong>Register Webhook</strong>.
+      </p>
+    </div>
+    <div class="oe_span4" style="text-align:center;">
+      <div style="width:64px;height:64px;background:#7C5CFC;color:#fff;border-radius:50%;font-size:28px;font-weight:bold;line-height:64px;margin:0 auto 12px;">3</div>
+      <h4 style="color:#0A1628;">Bind approvers</h4>
+      <p style="font-size:14px;line-height:1.5;color:#333;">
+        Each approver opens My Preferences, clicks <strong>Bind Telegram</strong>, follows the deep link, presses <strong>Send</strong>. The bot replies "Bound to &lt;login&gt;".
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12" style="text-align:center;">
+      <h2 style="color:#0A1628;font-weight:700;">Why Telegram, not email or SMS</h2>
+    </div>
+  </div>
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <table style="width:100%;max-width:780px;margin:0 auto;border-collapse:collapse;font-size:14px;">
+        <thead>
+          <tr style="background:#0A1628;color:#fff;">
+            <th style="padding:10px;text-align:left;">Channel</th>
+            <th style="padding:10px;">Cost per message</th>
+            <th style="padding:10px;">Inline action</th>
+            <th style="padding:10px;">Push delivery</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #e0e0e0;background:#00D4AA22;">
+            <td style="padding:10px;"><strong>Telegram</strong></td>
+            <td style="padding:10px;text-align:center;color:#00D4AA;font-weight:bold;">Free</td>
+            <td style="padding:10px;text-align:center;">One-tap buttons</td>
+            <td style="padding:10px;text-align:center;color:#00D4AA;font-weight:bold;">Native</td>
+          </tr>
+          <tr style="border-bottom:1px solid #e0e0e0;">
+            <td style="padding:10px;">Email</td>
+            <td style="padding:10px;text-align:center;">Free</td>
+            <td style="padding:10px;text-align:center;color:#888;">Click a link</td>
+            <td style="padding:10px;text-align:center;color:#888;">Inbox noise</td>
+          </tr>
+          <tr style="border-bottom:1px solid #e0e0e0;">
+            <td style="padding:10px;">SMS (Twilio)</td>
+            <td style="padding:10px;text-align:center;">~$0.05</td>
+            <td style="padding:10px;text-align:center;color:#888;">None</td>
+            <td style="padding:10px;text-align:center;">Native</td>
+          </tr>
+          <tr>
+            <td style="padding:10px;">WhatsApp Business</td>
+            <td style="padding:10px;text-align:center;">~$0.005-0.05</td>
+            <td style="padding:10px;text-align:center;">Buttons in templates</td>
+            <td style="padding:10px;text-align:center;">Native</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size:13px;color:#666;text-align:center;margin-top:14px;">
+        Telegram has 800M+ monthly active users in EU, MENA, UA and SEA -- the same regions where most Odoo installs live.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container oe_dark">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span6">
+      <h3 style="color:#0A1628;">
+        <span style="display:inline-block;width:32px;height:32px;background:#00D4AA;color:#0A1628;border-radius:50%;text-align:center;line-height:32px;font-weight:bold;margin-right:8px;">PO</span>
+        Threshold-gated Purchase Orders
+      </h3>
+      <p style="font-size:15px;line-height:1.6;color:#333;">
+        Configure a <strong>Threshold</strong> and a <strong>Default approver</strong>
+        in Settings -&gt; Telegram -&gt; Purchase Approvals. POs at or above the
+        threshold are gated through Telegram; smaller POs confirm normally
+        with no approver friction. Self-approve is blocked: requester ==
+        approver = no Telegram detour.
+      </p>
+    </div>
+    <div class="oe_span6">
+      <img src="screenshots/02_settings.png" alt="Telegram Settings page in Odoo with Bot, Webhook, 2FA, Purchase Approvals blocks"
+           style="max-width:100%;border:1px solid #e0e0e0;border-radius:4px;"/>
+    </div>
+  </div>
+
+  <div class="oe_row oe_spaced">
+    <div class="oe_span6">
+      <img src="screenshots/03_approvals_list.png" alt="Telegram Approvals dashboard showing pending and resolved requests"
+           style="max-width:100%;border:1px solid #e0e0e0;border-radius:4px;"/>
+    </div>
+    <div class="oe_span6">
+      <h3 style="color:#0A1628;">
+        <span style="display:inline-block;width:32px;height:32px;background:#00D4AA;color:#0A1628;border-radius:50%;text-align:center;line-height:32px;font-weight:bold;margin-right:8px;">L</span>
+        Full ledger of every request
+      </h3>
+      <p style="font-size:15px;line-height:1.6;color:#333;">
+        Every approval request is a row: source PO, requester, approver,
+        state, summary that was delivered to Telegram, the response time,
+        the deep link back to Odoo. Stale pending requests auto-expire on
+        a 30-minute cron. Audit log captures who tapped what, from which
+        chat, with which Telegram message id.
+      </p>
+    </div>
+  </div>
+
+  <div class="oe_row oe_spaced">
+    <div class="oe_span6">
+      <h3 style="color:#0A1628;">
+        <span style="display:inline-block;width:32px;height:32px;background:#00D4AA;color:#0A1628;border-radius:50%;text-align:center;line-height:32px;font-weight:bold;margin-right:8px;">2F</span>
+        2FA login bundled in
+      </h3>
+      <p style="font-size:15px;line-height:1.6;color:#333;">
+        Same bot, same chat, no extra setup. Flip <strong>Enforce 2FA on
+        Login</strong> and every bound user is challenged with a 6-digit
+        code on login. 5-minute TTL, rate-limited (5 sends per 15 min).
+        Approvals work independently of this switch.
+      </p>
+    </div>
+    <div class="oe_span6">
+      <img src="screenshots/04_2fa_login.png" alt="Telegram 6-digit code form on Odoo login screen"
+           style="max-width:100%;border:1px solid #e0e0e0;border-radius:4px;"/>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <h2 style="color:#0A1628;font-weight:700;text-align:center;">Security</h2>
+      <p style="font-size:15px;line-height:1.6;color:#333;max-width:780px;margin:0 auto;">
+        The bot token lives in your <code>ir.config_parameter</code>, never
+        in any Rteam-hosted system. The webhook endpoint is guarded by both a
+        path secret and the <code>X-Telegram-Bot-Api-Secret-Token</code>
+        header. Each inline button carries <strong>HMAC-signed callback
+        data</strong> so an attacker who learns a request id alone cannot
+        forge a tap. Stdlib <code>urllib</code> only -- no external Python
+        dependencies, no surprise CVE pull-ins.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container oe_dark">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12">
+      <h2 style="color:#0A1628;font-weight:700;text-align:center;">Building your own integration</h2>
+      <p style="font-size:15px;line-height:1.6;color:#333;max-width:780px;margin:0 auto;">
+        The approval ledger is source-agnostic. Your model implements one
+        method:
+      </p>
+      <pre style="background:#0A1628;color:#00FFD0;padding:14px;border-radius:6px;max-width:780px;margin:14px auto;font-size:13px;line-height:1.5;overflow-x:auto;">def on_rteam_tg_approval_resolved(self, request, new_state):
+    if new_state == "approved":
+        self.confirm()
+    elif new_state == "rejected":
+        self.message_post(body="Rejected via Telegram")</pre>
+      <p style="font-size:14px;color:#666;text-align:center;">
+        The Telegram side -- buttons, signed callbacks, expiry, audit, "Approved by X" status replacement -- is fully reusable. See
+        <a href="https://github.com/RteamAgency/rteam-tg-auth" style="color:#7C5CFC;">github.com/RteamAgency/rteam-tg-auth</a>
+        for the working pattern.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="oe_container">
+  <div class="oe_row oe_spaced">
+    <div class="oe_span12" style="text-align:center;">
+      <h2 style="color:#0A1628;font-weight:700;">Other Rteam Odoo apps</h2>
+      <p style="font-size:14px;line-height:1.6;color:#666;max-width:780px;margin:0 auto;">
+        <a href="https://apps.odoo.com/apps/modules/browse?author=Rteam" style="color:#7C5CFC;font-weight:bold;">All Rteam modules on apps.odoo.com</a> -- AI Assistant for Odoo, Daily Health Check, Prozorro Connector, FSM Repair Bridge, and more.
+      </p>
+      <p style="font-size:13px;color:#666;margin-top:14px;">
+        Built and maintained by <a href="https://rteam.agency" style="color:#7C5CFC;">Rteam</a> -- Odoo Enterprise specialists since 2019.
+        Questions? <a href="mailto:alex@rteam.top" style="color:#7C5CFC;">alex@rteam.top</a>.
+      </p>
+    </div>
+  </div>
+</section>
