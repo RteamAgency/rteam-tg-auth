@@ -100,9 +100,13 @@ class ResUsers(models.Model):
             _("Wrong code. Check your Telegram and try again, or request a new code.")
         )
 
-    def _get_session_token_fields(self):
-        # Invalidate live sessions when the binding row changes (revoke / rotate).
-        return super()._get_session_token_fields() | {"tg_binding_id"}
+    # NOTE: we used to override _get_session_token_fields to add
+    # ``tg_binding_id`` so that revoking a binding invalidated existing web
+    # sessions immediately. Including a One2many in that set crashed
+    # ``/web/login`` for the public user (id=3) because computing the
+    # session token traverses into rteam.tg.binding, which the public
+    # user has no ACL on. Reverted in v0.1.2.1; session-rotation on bind
+    # change is on the v0.2 backlog with a stored marker field.
 
     # ---------------------------------------------------------------- bind
 
