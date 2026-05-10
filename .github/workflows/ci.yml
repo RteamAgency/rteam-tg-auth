@@ -7,7 +7,7 @@ on:
     branches: [main, "17.0", "18.0", "19.0"]
 
 env:
-  MODULES: rteam_tg_auth rteam_tg_purchase
+  MODULES: rteam_tg_auth
 
 jobs:
   lint:
