@@ -1,10 +1,10 @@
 {
-    "name": "Rteam Telegram Approvals & 2FA",
-    "version": "19.0.2.1.1",
+    "name": "Rteam Telegram 2FA & Approvals",
+    "version": "19.0.2.1.2",
     "category": "Productivity",
     "summary": "Approve POs, invoices and more from Telegram with one tap. Login 2FA included.",
     "description": """
-Rteam Telegram Approvals & 2FA
+Rteam Telegram 2FA & Approvals
 ==============================
 
 Approve Purchase Orders, Vendor Bills, Time Off and other Odoo records
