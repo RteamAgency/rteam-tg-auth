@@ -13,6 +13,12 @@
               action="action_rteam_tg_binding"
               sequence="10"/>
 
+    <menuitem id="menu_rteam_tg_approvals"
+              name="Approvals"
+              parent="menu_rteam_tg_root"
+              action="action_rteam_tg_approval"
+              sequence="15"/>
+
     <menuitem id="menu_rteam_tg_audit"
               name="Audit Log"
               parent="menu_rteam_tg_root"

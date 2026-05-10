@@ -189,7 +189,53 @@ class RteamTgAuthController(http.Controller):
     # ------------------------------------------------------------------ helpers
 
     def _handle_update(self, update):
-        message = update.get("message") or {}
+        # Inline-button taps come as callback_query, not message.
+        cb = update.get("callback_query")
+        if cb:
+            self._handle_callback_query(cb)
+            return
+        self._handle_message(update.get("message") or {})
+
+    def _handle_callback_query(self, cb):
+        callback_query_id = cb.get("id")
+        data = cb.get("data") or ""
+        from_user = cb.get("from") or {}
+        actor_chat_id = from_user.get("id")
+
+        env = request.env(su=True)
+        Approval = env["rteam.tg.approval.request"]
+        request_rec, action = Approval._verify_signed_callback(data)
+        if not request_rec:
+            env["rteam.tg.audit"].create(
+                {
+                    "event": "approval_callback_invalid",
+                    "note": f"data={data[:60]} from chat={actor_chat_id}",
+                }
+            )
+            # Best-effort ack so the spinner stops on the user's button.
+            from ..models.telegram_api import (
+                TelegramApiError,
+                answer_callback_query,
+            )
+
+            token = env["ir.config_parameter"].sudo().get_param("rteam_tg_auth.bot_token")
+            if token and callback_query_id:
+                try:
+                    answer_callback_query(
+                        token,
+                        callback_query_id,
+                        text=_("This button is no longer valid."),
+                    )
+                except TelegramApiError:
+                    _logger.exception("rteam_tg_auth: ack on invalid callback failed")
+            return
+        request_rec._resolve(
+            action,
+            callback_query_id=callback_query_id,
+            actor_chat_id=actor_chat_id,
+        )
+
+    def _handle_message(self, message):
         text = (message.get("text") or "").strip()
         chat = message.get("chat") or {}
         from_user = message.get("from") or {}

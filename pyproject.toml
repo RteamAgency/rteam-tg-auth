@@ -3,6 +3,7 @@ line-length = 100
 target-version = "py310"
 extend-exclude = [
     "rteam_tg_auth/__pycache__",
+    "rteam_tg_purchase/__pycache__",
 ]
 
 [tool.ruff.lint]
@@ -16,3 +17,4 @@ ignore = [
 "__init__.py" = ["F401"]                # Odoo re-exports
 "rteam_tg_auth/tests/__init__.py" = ["F401"]
 "rteam_tg_auth/__manifest__.py" = ["B018"]
+"rteam_tg_purchase/__manifest__.py" = ["B018"]

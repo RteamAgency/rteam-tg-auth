@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_rteam_tg_approval_list" model="ir.ui.view">
+        <field name="name">rteam.tg.approval.request.list</field>
+        <field name="model">rteam.tg.approval.request</field>
+        <field name="arch" type="xml">
+            <list string="Telegram Approval Requests" create="false" delete="false">
+                <field name="create_date" string="Requested"/>
+                <field name="source_ref"/>
+                <field name="source_model"/>
+                <field name="requester_user_id"/>
+                <field name="approver_user_id"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'pending'"
+                       decoration-success="state == 'approved'"
+                       decoration-danger="state == 'rejected'"
+                       decoration-muted="state in ('expired','cancelled')"/>
+                <field name="responded_at"/>
+                <field name="expires_at"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_rteam_tg_approval_form" model="ir.ui.view">
+        <field name="name">rteam.tg.approval.request.form</field>
+        <field name="model">rteam.tg.approval.request</field>
+        <field name="arch" type="xml">
+            <form string="Telegram Approval Request" create="false" edit="false" delete="false">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="source_ref" readonly="1"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="source_model"/>
+                            <field name="source_id"/>
+                            <field name="requester_user_id"/>
+                            <field name="approver_user_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group>
+                            <field name="create_date" string="Requested at"/>
+                            <field name="expires_at"/>
+                            <field name="responded_at"/>
+                            <field name="response_note"/>
+                            <field name="tg_chat_id"/>
+                            <field name="tg_message_id"/>
+                        </group>
+                    </group>
+                    <group string="Summary delivered to Telegram">
+                        <field name="summary" nolabel="1"/>
+                    </group>
+                    <group string="Deep link">
+                        <field name="deep_link_url" widget="url" nolabel="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_rteam_tg_approval_search" model="ir.ui.view">
+        <field name="name">rteam.tg.approval.request.search</field>
+        <field name="model">rteam.tg.approval.request</field>
+        <field name="arch" type="xml">
+            <search string="Approval Requests">
+                <field name="source_ref"/>
+                <field name="source_model"/>
+                <field name="requester_user_id"/>
+                <field name="approver_user_id"/>
+                <filter name="pending" string="Pending" domain="[('state','=','pending')]"/>
+                <filter name="approved" string="Approved" domain="[('state','=','approved')]"/>
+                <filter name="rejected" string="Rejected" domain="[('state','=','rejected')]"/>
+                <separator/>
+                <filter name="expired" string="Expired" domain="[('state','=','expired')]"/>
+                <group>
+                    <filter name="group_state" string="State" context="{'group_by':'state'}"/>
+                    <filter name="group_approver" string="Approver" context="{'group_by':'approver_user_id'}"/>
+                    <filter name="group_source_model" string="Source model" context="{'group_by':'source_model'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_rteam_tg_approval" model="ir.actions.act_window">
+        <field name="name">Telegram Approvals</field>
+        <field name="res_model">rteam.tg.approval.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_pending': 1}</field>
+    </record>
+
+</odoo>

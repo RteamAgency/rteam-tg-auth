@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form_rteam_tg_purchase" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.rteam.tg.purchase</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="rteam_tg_auth.res_config_settings_view_form_rteam_tg"/>
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='rteam_tg_auth']//block[@name='rteam_tg_policy']" position="after">
+                <block title="Purchase Approvals" name="rteam_tg_purchase">
+                    <setting id="rteam_tg_purchase_threshold_setting"
+                             string="Threshold"
+                             help="Confirm POs at or above this amount only after Telegram approval. Below this, POs confirm normally.">
+                        <field name="rteam_tg_purchase_threshold"/>
+                    </setting>
+                    <setting id="rteam_tg_purchase_approver_setting"
+                             string="Default approver"
+                             help="The user who will receive the Telegram approval request. They must already have a Bind Telegram done.">
+                        <field name="rteam_tg_purchase_approver_id"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

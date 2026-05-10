@@ -12,6 +12,21 @@
             <field name="value">600</field>
         </record>
 
+        <record id="param_approval_ttl_seconds" model="ir.config_parameter">
+            <field name="key">rteam_tg_auth.approval_ttl_seconds</field>
+            <field name="value">86400</field>
+        </record>
+
+        <record id="cron_expire_approvals" model="ir.cron">
+            <field name="name">Telegram 2FA: expire stale approval requests</field>
+            <field name="model_id" ref="model_rteam_tg_approval_request"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_expire_stale()</field>
+            <field name="interval_number">30</field>
+            <field name="interval_type">minutes</field>
+            <field name="active">True</field>
+        </record>
+
         <record id="param_code_ttl_seconds" model="ir.config_parameter">
             <field name="key">rteam_tg_auth.code_ttl_seconds</field>
             <field name="value">300</field>

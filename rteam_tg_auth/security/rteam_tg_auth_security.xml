@@ -31,6 +31,20 @@
             <field name="groups" eval="[(4, ref('group_rteam_tg_admin'))]"/>
         </record>
 
+        <record id="rule_tg_approval_user_own" model="ir.rule">
+            <field name="name">Telegram approval: user sees own (as requester or approver)</field>
+            <field name="model_id" ref="model_rteam_tg_approval_request"/>
+            <field name="domain_force">['|', ('approver_user_id', '=', user.id), ('requester_user_id', '=', user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_rteam_tg_user'))]"/>
+        </record>
+
+        <record id="rule_tg_approval_admin_all" model="ir.rule">
+            <field name="name">Telegram approval: admin sees all</field>
+            <field name="model_id" ref="model_rteam_tg_approval_request"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_rteam_tg_admin'))]"/>
+        </record>
+
     </data>
 
     <!-- Cross-grants on existing base groups: NO noupdate, so on every

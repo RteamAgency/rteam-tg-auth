@@ -77,6 +77,37 @@ def send_message(token, chat_id, text, parse_mode=None, timeout=DEFAULT_TIMEOUT)
     return _request(token, "sendMessage", payload=payload, timeout=timeout)
 
 
+def send_message_with_buttons(
+    token, chat_id, text, reply_markup, parse_mode=None, timeout=DEFAULT_TIMEOUT
+):
+    """Send a message with an inline keyboard. ``reply_markup`` is a dict like
+    ``{"inline_keyboard": [[{"text": ..., "callback_data": ...}]]}``."""
+    payload = {"chat_id": chat_id, "text": text, "reply_markup": reply_markup}
+    if parse_mode:
+        payload["parse_mode"] = parse_mode
+    return _request(token, "sendMessage", payload=payload, timeout=timeout)
+
+
+def edit_message_reply_markup(token, chat_id, message_id, reply_markup, timeout=DEFAULT_TIMEOUT):
+    """Replace the inline keyboard of an existing message (e.g. to flip
+    Approve/Reject buttons into a "Approved by X" status)."""
+    payload = {
+        "chat_id": chat_id,
+        "message_id": int(message_id),
+        "reply_markup": reply_markup,
+    }
+    return _request(token, "editMessageReplyMarkup", payload=payload, timeout=timeout)
+
+
+def answer_callback_query(token, callback_query_id, text=None, timeout=DEFAULT_TIMEOUT):
+    """Acknowledge an inline-button tap. Without this Telegram shows a
+    spinner on the button forever."""
+    payload = {"callback_query_id": callback_query_id}
+    if text:
+        payload["text"] = text[:200]  # Telegram caps text at 200 chars
+    return _request(token, "answerCallbackQuery", payload=payload, timeout=timeout)
+
+
 def set_webhook(token, url, secret_token=None, timeout=DEFAULT_TIMEOUT):
     """Register webhook URL with Telegram. Pass empty url to delete."""
     payload = {"url": url}
