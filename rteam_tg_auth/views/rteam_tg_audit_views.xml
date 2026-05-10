@@ -20,15 +20,15 @@
         <field name="name">rteam.tg.audit.search</field>
         <field name="model">rteam.tg.audit</field>
         <field name="arch" type="xml">
-            <search>
+            <search string="Audit Log">
                 <field name="user_id"/>
                 <field name="event"/>
                 <field name="ip"/>
-                <filter name="rejected" string="Rejected challenges" domain="[('event', '=', 'challenge_rejected')]"/>
-                <filter name="rate_limited" string="Rate limited" domain="[('event', '=', 'rate_limited')]"/>
-                <group expand="0" string="Group By">
-                    <filter name="group_user" string="User" context="{'group_by': 'user_id'}"/>
-                    <filter name="group_event" string="Event" context="{'group_by': 'event'}"/>
+                <filter name="rejected" string="Rejected challenges" domain="[('event','=','challenge_rejected')]"/>
+                <filter name="rate_limited" string="Rate limited" domain="[('event','=','rate_limited')]"/>
+                <group>
+                    <filter name="group_user" string="User" context="{'group_by':'user_id'}"/>
+                    <filter name="group_event" string="Event" context="{'group_by':'event'}"/>
                 </group>
             </search>
         </field>
