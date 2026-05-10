@@ -69,6 +69,39 @@ Same brand kit, smaller. `static/description/icon.png` 128x128, just the
 the apps.odoo.com listing icon and the Odoo navbar `web_icon` for the
 root menu (declared in `views/rteam_tg_auth_menus.xml`).
 
+Generate at 1:1, 1024x1024, downscale: `sips -Z 128 src.png --out icon.png`.
+
+### Prompt for nano banana pro (icon)
+
+```
+Square 1:1 app icon, 1024x1024, light Glass aesthetic, designed to read
+clearly when downscaled to 128x128 and 64x64.
+
+Background: a single rounded-square card filling 92% of the canvas,
+corner radius ~20% of the card width, fill #F7F8FA, very thin 1px
+inner stroke #E5E7EB. Behind the card, two soft circular blurs barely
+peeking from the corners --- violet #7C5CFC at 10% opacity (upper-left,
+~35% of canvas, 80px blur) and teal #00D4AA at 7% opacity (lower-right,
+~30% of canvas, 70px blur). Card has a very subtle outer drop shadow
+(0 6px 20px rgba(10,22,40,0.06)).
+
+Centerpiece, taking ~70% of the card width: a single bold monogram "T+"
+in heavy geometric sans, uppercase, perfectly centered. Letter fill is
+the rteam signature gradient --- linear-gradient(135deg, #7C5CFC 0%,
+#00D4AA 100%), violet top-left to teal bottom-right. The "+" sits
+slightly above baseline and is the same cap-height as the "T". Minimal
+optical kerning between letters, treat them as one shape.
+
+A small Telegram paper-plane glyph in the bottom-right of the card,
+tucked inside the corner padding, sized at ~12% of card width, fill
+#26A5E4 at 75% opacity. The plane points up-right at ~30 degrees.
+
+No text other than "T+". No labels, no tiles, no background grid, no
+gradient on the background card itself --- the only color comes from
+the monogram and the soft corner blurs. Negative space generous so
+the mark stays legible at app-store thumb size.
+```
+
 ## Common pitfalls
 
 - nano banana defaults to 16:9 for "wide" -- explicitly say 2:1 and
