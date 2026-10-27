@@ -83,13 +83,14 @@ class RteamTgBinding(models.Model):
     pending_code_expires_at = fields.Datetime()
     pending_code_attempts = fields.Integer(default=0)
 
-    _sql_constraints = [
-        (
-            "user_unique_active",
-            "unique(user_id)",
-            "A user can only have one Telegram binding.",
-        ),
-    ]
+    # Odoo 19 ignores _sql_constraints, so the old declaration never reached
+    # the database. Without it a double "Bind" left two rows, and the login
+    # check read the pending one and skipped 2FA. The attribute name keeps
+    # the constraint name a database upgraded from 18.0 already has.
+    _user_unique_active = models.Constraint(
+        "UNIQUE(user_id)",
+        "A user can only have one Telegram binding.",
+    )
 
     # ---------------------------------------------------------------- helpers
 

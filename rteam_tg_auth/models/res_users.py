@@ -38,10 +38,21 @@ class ResUsers(models.Model):
         store=False,
     )
 
+    def _rteam_tg_binding(self):
+        """The user's binding, an active one first.
+
+        UNIQUE(user_id) keeps one row per user. Preferring the active row
+        keeps 2FA on even if a database ever holds a second one (Odoo only
+        logs a warning when it cannot add a constraint).
+        """
+        self.ensure_one()
+        bindings = self.tg_binding_id
+        return bindings.filtered(lambda b: b.state == "active")[:1] or bindings[:1]
+
     @api.depends("tg_binding_id.state", "tg_binding_id.recovery_codes")
     def _compute_tg_2fa_state(self):
         for user in self:
-            binding = user.tg_binding_id[:1]
+            binding = user._rteam_tg_binding()
             user.tg_2fa_state = binding.state if binding else "none"
             user.tg_recovery_codes_remaining = binding.recovery_codes_remaining() if binding else 0
 
@@ -85,7 +96,7 @@ class ResUsers(models.Model):
             return super()._check_credentials(credentials, env)
 
         sudo = self.sudo()
-        binding = sudo.tg_binding_id[:1]
+        binding = sudo._rteam_tg_binding()
         if not binding or binding.state != "active":
             _logger.info("rteam_tg 2FA: no active binding for %r", sudo.login)
             raise AccessDenied(_("Telegram 2FA is not configured for this user."))

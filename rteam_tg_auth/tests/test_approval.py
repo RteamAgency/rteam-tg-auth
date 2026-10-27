@@ -195,7 +195,7 @@ class TestApprovalLifecycle(TransactionCase):
         with self._patched():
             count = Approval._cron_expire_stale()
         self.assertGreaterEqual(count, 1)
-        stale.refresh()
-        fresh.refresh()
+        stale.invalidate_recordset()
+        fresh.invalidate_recordset()
         self.assertEqual(stale.state, "expired")
         self.assertEqual(fresh.state, "pending")

@@ -6,6 +6,8 @@ from unittest.mock import patch
 from odoo import fields
 from odoo.exceptions import UserError
 from odoo.tests.common import TransactionCase
+from odoo.tools import mute_logger
+from psycopg2 import IntegrityError
 
 
 class TestBindingChallenge(TransactionCase):
@@ -31,6 +33,21 @@ class TestBindingChallenge(TransactionCase):
             "odoo.addons.rteam_tg_auth.models.rteam_tg_binding.send_message",
             return_value=return_value or {"message_id": 42},
         )
+
+    def test_second_binding_for_same_user_is_refused(self):
+        # Before 19.0.2.1.3 a second (pending) row could exist and hide the
+        # active one from the login check, which then skipped 2FA.
+        with self.assertRaises(IntegrityError), mute_logger("odoo.sql_db"):
+            self.env["rteam.tg.binding"].create({"user_id": self.user.id, "state": "pending"})
+
+    def test_unique_constraint_keeps_the_18_0_name(self):
+        # A database upgraded from 18.0 already has this constraint; another
+        # name would add a second, identical one.
+        self.env.cr.execute(
+            "SELECT 1 FROM pg_constraint WHERE conname = %s AND contype = 'u'",
+            ["rteam_tg_binding_user_unique_active"],
+        )
+        self.assertTrue(self.env.cr.fetchone())
 
     # ---------------------------------------------------------------- issue
 
@@ -75,9 +92,16 @@ class TestBindingChallenge(TransactionCase):
                     "event": "challenge_sent",
                 }
             )
+        # The login controller catches this UserError and renders the form, so
+        # the transaction and its audit row commit. Catch it the same way:
+        # assertRaises would roll back to a savepoint and drop the row.
         with self._patched_send():
-            with self.assertRaises(UserError):
+            try:
                 self.binding.issue_challenge()
+            except UserError:
+                pass
+            else:
+                self.fail("issue_challenge did not refuse past the rate limit")
         # rate_limited audit row written.
         rate = self.env["rteam.tg.audit"].search(
             [("user_id", "=", self.user.id), ("event", "=", "rate_limited")]
