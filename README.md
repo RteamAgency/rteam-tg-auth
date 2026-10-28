@@ -134,8 +134,7 @@ for the working pattern.
 
 * `rteam_tg_auth` 19.0.2.0.0
 * `rteam_tg_purchase` 19.0.1.0.0
-* Targeted Odoo versions: 19 (main / `19.0`); backports to 17 and 18
-  follow on the `17.0` and `18.0` branches.
+* Targeted Odoo versions: 19 (main / `19.0`) and 20 (`20.0`).
 * Tests: smoke only at the moment; coverage target 70% before
   apps.odoo.com submission. See `tests/`.
 

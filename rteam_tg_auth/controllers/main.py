@@ -84,8 +84,7 @@ class RteamTgLoginHome(web_home.Home):
                     "redirect": redirect,
                     "bot_username": request.env["ir.config_parameter"]
                     .sudo()
-                    .get_param("rteam_tg_auth.bot_username")
-                    or "",
+                    .get_str("rteam_tg_auth.bot_username"),
                 },
             )
 
@@ -110,8 +109,7 @@ class RteamTgLoginHome(web_home.Home):
                     "redirect": redirect,
                     "bot_username": request.env["ir.config_parameter"]
                     .sudo()
-                    .get_param("rteam_tg_auth.bot_username")
-                    or "",
+                    .get_str("rteam_tg_auth.bot_username"),
                 },
             )
 
@@ -148,8 +146,7 @@ class RteamTgLoginHome(web_home.Home):
                 "redirect": redirect,
                 "bot_username": request.env["ir.config_parameter"]
                 .sudo()
-                .get_param("rteam_tg_auth.bot_username")
-                or "",
+                .get_str("rteam_tg_auth.bot_username"),
             },
         )
 
@@ -164,7 +161,7 @@ class RteamTgAuthController(http.Controller):
     )
     def webhook(self, secret, **_kw):
         params = request.env["ir.config_parameter"].sudo()
-        configured = params.get_param("rteam_tg_auth.webhook_secret")
+        configured = params.get_str("rteam_tg_auth.webhook_secret")
         if not configured or secret != configured:
             _logger.warning("rteam_tg_auth: webhook called with bad path secret")
             return request.make_response("forbidden", status=403)
@@ -218,7 +215,7 @@ class RteamTgAuthController(http.Controller):
                 answer_callback_query,
             )
 
-            token = env["ir.config_parameter"].sudo().get_param("rteam_tg_auth.bot_token")
+            token = env["ir.config_parameter"].sudo().get_str("rteam_tg_auth.bot_token")
             if token and callback_query_id:
                 try:
                     answer_callback_query(
@@ -350,7 +347,7 @@ class RteamTgAuthController(http.Controller):
         )
 
     def _reply(self, chat_id, text):
-        token = request.env["ir.config_parameter"].sudo().get_param("rteam_tg_auth.bot_token")
+        token = request.env["ir.config_parameter"].sudo().get_str("rteam_tg_auth.bot_token")
         if not token:
             return
         try:

@@ -105,39 +105,22 @@ class RteamTgBinding(models.Model):
     def _params(self):
         return self.env["ir.config_parameter"].sudo()
 
+    # get_int returns the default for a missing or non-numeric value.
     def _code_ttl_seconds(self):
-        try:
-            return int(self._params().get_param("rteam_tg_auth.code_ttl_seconds", DEFAULT_CODE_TTL))
-        except (TypeError, ValueError):
-            return DEFAULT_CODE_TTL
+        return self._params().get_int("rteam_tg_auth.code_ttl_seconds", DEFAULT_CODE_TTL)
 
     def _code_attempt_limit(self):
-        try:
-            return int(
-                self._params().get_param(
-                    "rteam_tg_auth.code_attempt_limit", DEFAULT_CODE_ATTEMPT_LIMIT
-                )
-            )
-        except (TypeError, ValueError):
-            return DEFAULT_CODE_ATTEMPT_LIMIT
+        return self._params().get_int(
+            "rteam_tg_auth.code_attempt_limit", DEFAULT_CODE_ATTEMPT_LIMIT
+        )
 
     def _rate_limit_window(self):
-        try:
-            return int(
-                self._params().get_param(
-                    "rteam_tg_auth.rate_limit_window_seconds", DEFAULT_RATE_LIMIT_WINDOW
-                )
-            )
-        except (TypeError, ValueError):
-            return DEFAULT_RATE_LIMIT_WINDOW
+        return self._params().get_int(
+            "rteam_tg_auth.rate_limit_window_seconds", DEFAULT_RATE_LIMIT_WINDOW
+        )
 
     def _rate_limit_max(self):
-        try:
-            return int(
-                self._params().get_param("rteam_tg_auth.rate_limit_max", DEFAULT_RATE_LIMIT_MAX)
-            )
-        except (TypeError, ValueError):
-            return DEFAULT_RATE_LIMIT_MAX
+        return self._params().get_int("rteam_tg_auth.rate_limit_max", DEFAULT_RATE_LIMIT_MAX)
 
     @staticmethod
     def _hash_code(code):
@@ -291,7 +274,7 @@ class RteamTgBinding(models.Model):
         self._check_rate_limit()
 
         code = f"{secrets.randbelow(1_000_000):06d}"
-        token = self.env["ir.config_parameter"].sudo().get_param("rteam_tg_auth.bot_token")
+        token = self.env["ir.config_parameter"].sudo().get_str("rteam_tg_auth.bot_token")
         if not token:
             raise UserError(_("The Telegram bot is not configured. Contact your administrator."))
 

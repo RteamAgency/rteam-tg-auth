@@ -49,7 +49,7 @@ class ResConfigSettings(models.TransientModel):
         # Persist current edits before talking to Telegram so the token used
         # for the call matches what the admin sees in the form.
         self.execute()
-        token = self.env["ir.config_parameter"].sudo().get_param("rteam_tg_auth.bot_token")
+        token = self.env["ir.config_parameter"].sudo().get_str("rteam_tg_auth.bot_token")
         if not token:
             raise UserError(_("Set the bot token first, then click Validate."))
         try:
@@ -57,7 +57,7 @@ class ResConfigSettings(models.TransientModel):
         except TelegramApiError as e:
             raise UserError(_("Telegram rejected the token:\n\n%(err)s", err=str(e))) from e
         username = bot.get("username") or ""
-        self.env["ir.config_parameter"].sudo().set_param("rteam_tg_auth.bot_username", username)
+        self.env["ir.config_parameter"].sudo().set_str("rteam_tg_auth.bot_username", username)
         return {
             "type": "ir.actions.client",
             "tag": "display_notification",
@@ -85,18 +85,18 @@ class ResConfigSettings(models.TransientModel):
         self.ensure_one()
         self.execute()
         params = self.env["ir.config_parameter"].sudo()
-        token = params.get_param("rteam_tg_auth.bot_token")
-        base_url = (params.get_param("rteam_tg_auth.webhook_base_url") or "").rstrip("/")
+        token = params.get_str("rteam_tg_auth.bot_token")
+        base_url = params.get_str("rteam_tg_auth.webhook_base_url").rstrip("/")
         if not token:
             raise UserError(_("Set the bot token first, then click Validate."))
         if not base_url:
             raise UserError(_("Set the Public Base URL first (e.g. https://mycompany.odoo.com)."))
         if not base_url.startswith("https://"):
             raise UserError(_("Telegram requires the webhook URL to use HTTPS."))
-        secret = params.get_param("rteam_tg_auth.webhook_secret")
+        secret = params.get_str("rteam_tg_auth.webhook_secret")
         if not secret:
             secret = secrets.token_hex(16)
-            params.set_param("rteam_tg_auth.webhook_secret", secret)
+            params.set_str("rteam_tg_auth.webhook_secret", secret)
         url = f"{base_url}/rteam_tg_auth/webhook/{secret}"
         try:
             set_webhook(token, url, secret_token=secret)

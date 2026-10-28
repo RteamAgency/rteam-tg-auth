@@ -88,25 +88,20 @@ class RteamTgApprovalRequest(models.Model):
 
     @api.model
     def _approval_ttl_seconds(self):
-        try:
-            return int(
-                self._params().get_param(
-                    "rteam_tg_auth.approval_ttl_seconds", DEFAULT_APPROVAL_TTL_SECONDS
-                )
-            )
-        except (TypeError, ValueError):
-            return DEFAULT_APPROVAL_TTL_SECONDS
+        return self._params().get_int(
+            "rteam_tg_auth.approval_ttl_seconds", DEFAULT_APPROVAL_TTL_SECONDS
+        )
 
     def _bot_token(self):
-        return self._params().get_param("rteam_tg_auth.bot_token") or ""
+        return self._params().get_str("rteam_tg_auth.bot_token")
 
     def _webhook_secret(self):
-        return self._params().get_param("rteam_tg_auth.webhook_secret") or ""
+        return self._params().get_str("rteam_tg_auth.webhook_secret")
 
     def _deep_link_for(self, source_model, source_id):
-        base_url = (self._params().get_param("rteam_tg_auth.webhook_base_url") or "").rstrip("/")
+        base_url = self._params().get_str("rteam_tg_auth.webhook_base_url").rstrip("/")
         if not base_url:
-            base_url = (self._params().get_param("web.base.url") or "").rstrip("/")
+            base_url = self._params().get_str("web.base.url").rstrip("/")
         if not base_url:
             return ""
         return f"{base_url}/odoo/action-base.action_ui?model={source_model}&id={source_id}&view_type=form"

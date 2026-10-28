@@ -1,6 +1,6 @@
 {
     "name": "Telegram 2FA & Approvals",
-    "version": "19.0.2.1.4",
+    "version": "20.0.2.1.4",
     "category": "Productivity",
     "summary": "Approve POs, invoices and more from Telegram with one tap. Login 2FA included.",
     "description": """
@@ -69,8 +69,8 @@ Building your own integration is one method on the source model:
 ``on_rteam_tg_approval_resolved(request, new_state)``. The Telegram
 side is fully reusable.
 
-Targeted at Odoo 19 (Community and Enterprise). Backports to 17 and 18
-follow on the ``17.0`` and ``18.0`` branches.
+Targeted at Odoo 20 (Community and Enterprise). Odoo 19 is served by
+the ``19.0`` branch.
 """,
     "author": "Rteam",
     "maintainer": "Rteam",
@@ -97,7 +97,7 @@ follow on the ``17.0`` and ``18.0`` branches.
         "views/res_config_settings_views.xml",
         "views/rteam_tg_login_template.xml",
         "views/rteam_tg_auth_menus.xml",
-        'security/ir.access.csv',
+        "security/ir.access.csv",
     ],
     "images": [
         "static/description/banner.png",

@@ -9,24 +9,24 @@ class TestMfaHooks(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.params = cls.env["ir.config_parameter"].sudo()
-        cls.params.set_param("rteam_tg_auth.bot_token", "TEST_TOKEN")
+        cls.params.set_str("rteam_tg_auth.bot_token", "TEST_TOKEN")
         cls.user_internal = cls.env["res.users"].create(
             {"name": "Internal U", "login": "internal_mfa_t3"}
         )
         cls.user_public = cls.env.ref("base.public_user")
 
     def test_mfa_type_none_when_unbound(self):
-        self.params.set_param("rteam_tg_auth.enforce_2fa", "True")
+        self.params.set_bool("rteam_tg_auth.enforce_2fa", True)
         self.assertIsNone(self.user_internal._mfa_type())
         self.assertIsNone(self.user_internal._mfa_url())
 
     def test_mfa_type_none_when_enforce_off(self):
-        self.params.set_param("rteam_tg_auth.enforce_2fa", "False")
+        self.params.set_bool("rteam_tg_auth.enforce_2fa", False)
         self._make_active_binding(self.user_internal)
         self.assertIsNone(self.user_internal._mfa_type())
 
     def test_mfa_type_set_when_enforced_and_bound(self):
-        self.params.set_param("rteam_tg_auth.enforce_2fa", "True")
+        self.params.set_bool("rteam_tg_auth.enforce_2fa", True)
         self._make_active_binding(self.user_internal)
         self.assertEqual(self.user_internal._mfa_type(), "rteam_tg")
         self.assertEqual(self.user_internal._mfa_url(), "/web/login/rteam_tg")
@@ -35,7 +35,7 @@ class TestMfaHooks(TransactionCase):
         # Even with enforce on, public user must never trigger TG 2FA --
         # they have no binding ACL and their session evaluation must not
         # 500 the /web/login page (regression guard for v0.1.2.2).
-        self.params.set_param("rteam_tg_auth.enforce_2fa", "True")
+        self.params.set_bool("rteam_tg_auth.enforce_2fa", True)
         self.assertIsNone(self.user_public._mfa_type())
         self.assertIsNone(self.user_public._mfa_url())
 

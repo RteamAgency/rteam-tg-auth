@@ -13,8 +13,8 @@ class TestApprovalSignature(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         params = cls.env["ir.config_parameter"].sudo()
-        params.set_param("rteam_tg_auth.bot_token", "TEST_TOKEN")
-        params.set_param("rteam_tg_auth.webhook_secret", "deadbeef" * 4)
+        params.set_str("rteam_tg_auth.bot_token", "TEST_TOKEN")
+        params.set_str("rteam_tg_auth.webhook_secret", "deadbeef" * 4)
         cls.Approval = cls.env["rteam.tg.approval.request"]
 
     def test_sign_is_deterministic_per_secret_payload(self):
@@ -28,7 +28,7 @@ class TestApprovalSignature(TransactionCase):
         self.assertEqual(len(a), 8)
 
     def test_sign_returns_empty_when_secret_missing(self):
-        self.env["ir.config_parameter"].sudo().set_param("rteam_tg_auth.webhook_secret", "")
+        self.env["ir.config_parameter"].sudo().set_str("rteam_tg_auth.webhook_secret", "")
         self.assertEqual(self.Approval._sign(42, "y"), "")
 
     def test_verify_signed_callback_rejects_garbage(self):
@@ -56,8 +56,8 @@ class TestApprovalLifecycle(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         params = cls.env["ir.config_parameter"].sudo()
-        params.set_param("rteam_tg_auth.bot_token", "TEST_TOKEN")
-        params.set_param("rteam_tg_auth.webhook_secret", "deadbeef" * 4)
+        params.set_str("rteam_tg_auth.bot_token", "TEST_TOKEN")
+        params.set_str("rteam_tg_auth.webhook_secret", "deadbeef" * 4)
         cls.requester = cls.env["res.users"].create({"name": "Req User", "login": "req_user_t2"})
         cls.approver = cls.env["res.users"].create({"name": "Appr User", "login": "appr_user_t2"})
         cls.env["rteam.tg.binding"].create(

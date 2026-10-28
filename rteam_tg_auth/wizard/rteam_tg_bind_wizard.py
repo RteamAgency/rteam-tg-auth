@@ -37,9 +37,7 @@ class RteamTgBindWizard(models.TransientModel):
 
     @api.depends("bind_token")
     def _compute_bot_username(self):
-        username = (
-            self.env["ir.config_parameter"].sudo().get_param("rteam_tg_auth.bot_username") or ""
-        )
+        username = self.env["ir.config_parameter"].sudo().get_str("rteam_tg_auth.bot_username")
         for wiz in self:
             wiz.bot_username = username
 

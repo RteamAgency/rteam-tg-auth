@@ -70,10 +70,7 @@ class ResUsers(models.Model):
             return False
         if self.sudo().tg_2fa_state != "active":
             return False
-        enforce = (
-            self.env["ir.config_parameter"].sudo().get_param("rteam_tg_auth.enforce_2fa", "False")
-        )
-        return str(enforce).lower() in ("1", "true", "yes")
+        return self.env["ir.config_parameter"].sudo().get_bool("rteam_tg_auth.enforce_2fa")
 
     def _mfa_type(self):
         r = super()._mfa_type()
@@ -136,7 +133,7 @@ class ResUsers(models.Model):
     def _rteam_tg_bot_username(self):
         """Resolved bot username from Settings; raises if Settings is unconfigured."""
         params = self.env["ir.config_parameter"].sudo()
-        username = params.get_param("rteam_tg_auth.bot_username")
+        username = params.get_str("rteam_tg_auth.bot_username")
         if not username:
             raise UserError(
                 _(
@@ -148,12 +145,7 @@ class ResUsers(models.Model):
 
     def _rteam_tg_bind_ttl_seconds(self):
         params = self.env["ir.config_parameter"].sudo()
-        try:
-            return int(
-                params.get_param("rteam_tg_auth.bind_token_ttl_seconds", DEFAULT_BIND_TTL_SECONDS)
-            )
-        except (TypeError, ValueError):
-            return DEFAULT_BIND_TTL_SECONDS
+        return params.get_int("rteam_tg_auth.bind_token_ttl_seconds", DEFAULT_BIND_TTL_SECONDS)
 
     def action_rteam_tg_bind(self):
         """Open the Bind Telegram wizard for this user.

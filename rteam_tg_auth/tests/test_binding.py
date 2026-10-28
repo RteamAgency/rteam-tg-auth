@@ -15,8 +15,8 @@ class TestBindingChallenge(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.params = cls.env["ir.config_parameter"].sudo()
-        cls.params.set_param("rteam_tg_auth.bot_token", "TEST_TOKEN")
-        cls.params.set_param("rteam_tg_auth.bot_username", "test_bot")
+        cls.params.set_str("rteam_tg_auth.bot_token", "TEST_TOKEN")
+        cls.params.set_str("rteam_tg_auth.bot_username", "test_bot")
         cls.user = cls.env["res.users"].create({"name": "Bound User", "login": "bound_user_t1"})
         cls.binding = cls.env["rteam.tg.binding"].create(
             {
@@ -214,7 +214,7 @@ class TestRecoveryCodes(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.params = cls.env["ir.config_parameter"].sudo()
-        cls.params.set_param("rteam_tg_auth.bot_token", "TEST_TOKEN")
+        cls.params.set_str("rteam_tg_auth.bot_token", "TEST_TOKEN")
         cls.user = cls.env["res.users"].create({"name": "Recovery U", "login": "recovery_user_t1b"})
         cls.binding = cls.env["rteam.tg.binding"].create(
             {
