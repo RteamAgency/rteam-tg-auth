@@ -12,6 +12,7 @@ from datetime import timedelta
 
 from odoo import _, fields, models
 from odoo.exceptions import UserError
+from psycopg2 import IntegrityError
 
 from .telegram_api import TelegramApiError, send_message
 
@@ -91,6 +92,13 @@ class RteamTgBinding(models.Model):
         "UNIQUE(user_id)",
         "A user can only have one Telegram binding.",
     )
+    # One chat, one active user: otherwise whoever owns the chat receives a
+    # second user's login codes. The /start handler checks this first, but
+    # two handlers running at once both pass the check.
+    _chat_unique_active = models.UniqueIndex(
+        "(chat_id) WHERE state = 'active'",
+        "This Telegram chat is already linked to another Odoo user.",
+    )
 
     # ---------------------------------------------------------------- helpers
 
@@ -150,6 +158,33 @@ class RteamTgBinding(models.Model):
         return "-".join(
             raw[i : i + RECOVERY_GROUP_LEN] for i in range(0, len(raw), RECOVERY_GROUP_LEN)
         )
+
+    # ------------------------------------------------------------------ bind
+
+    def _activate(self, chat_id, tg_username):
+        """Finish the handshake: this binding goes active on ``chat_id``.
+
+        Returns False and changes nothing when the chat holds another
+        user's active binding, which the unique index reports at flush.
+        """
+        self.ensure_one()
+        try:
+            with self.env.cr.savepoint():
+                self.write(
+                    {
+                        "state": "active",
+                        "chat_id": chat_id,
+                        "tg_username": tg_username,
+                        "bound_at": fields.Datetime.now(),
+                        "bind_token": False,
+                        "bind_token_expires_at": False,
+                    }
+                )
+                self.flush_recordset()
+        except IntegrityError:
+            self.invalidate_recordset()
+            return False
+        return True
 
     # ---------------------------------------------------------------- recovery
 

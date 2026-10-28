@@ -297,7 +297,8 @@ class RteamTgAuthController(http.Controller):
             return
 
         # One TG chat = one Odoo user. Refuse if this chat is already wired
-        # to a different active user.
+        # to a different active user; the unique index refuses the write
+        # when another /start for this chat got there first.
         clash = Binding.search(
             [
                 ("chat_id", "=", str(chat_id)),
@@ -306,14 +307,18 @@ class RteamTgAuthController(http.Controller):
             ],
             limit=1,
         )
-        if clash:
+        if clash or not binding._activate(str(chat_id), from_user.get("username") or ""):
+            if clash:
+                note = f"Chat {chat_id} already bound to user {clash.user_id.id}"
+            else:
+                note = f"Chat {chat_id} was bound to another user at the same moment"
             Audit.create(
                 {
                     "user_id": binding.user_id.id,
                     "binding_id": binding.id,
                     "event": "bind_failed",
                     "tg_message_id": str(message.get("message_id") or ""),
-                    "note": f"Chat {chat_id} already bound to user {clash.user_id.id}",
+                    "note": note,
                 }
             )
             self._reply(
@@ -325,16 +330,6 @@ class RteamTgAuthController(http.Controller):
             )
             return
 
-        binding.write(
-            {
-                "state": "active",
-                "chat_id": str(chat_id),
-                "tg_username": from_user.get("username") or "",
-                "bound_at": fields.Datetime.now(),
-                "bind_token": False,
-                "bind_token_expires_at": False,
-            }
-        )
         Audit.create(
             {
                 "user_id": binding.user_id.id,

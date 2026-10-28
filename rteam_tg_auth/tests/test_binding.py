@@ -49,6 +49,46 @@ class TestBindingChallenge(TransactionCase):
         )
         self.assertTrue(self.env.cr.fetchone())
 
+    def test_second_active_binding_on_one_chat_is_refused(self):
+        other = self.env["res.users"].create({"name": "Other", "login": "bound_user_t1_other"})
+        with self.assertRaises(IntegrityError), mute_logger("odoo.sql_db"):
+            self.env["rteam.tg.binding"].create(
+                {"user_id": other.id, "state": "active", "chat_id": "123456"}
+            )
+
+    def test_chat_may_repeat_on_a_binding_that_is_not_active(self):
+        other = self.env["res.users"].create({"name": "Other", "login": "bound_user_t1_other"})
+        revoked = self.env["rteam.tg.binding"].create(
+            {"user_id": other.id, "state": "revoked", "chat_id": "123456"}
+        )
+        revoked.flush_recordset()
+        self.assertEqual(revoked.chat_id, "123456")
+
+    def test_activate_binds_a_free_chat(self):
+        other = self.env["res.users"].create({"name": "Other", "login": "bound_user_t1_other"})
+        pending = self.env["rteam.tg.binding"].create(
+            {"user_id": other.id, "state": "pending", "bind_token": "tok"}
+        )
+        self.assertTrue(pending._activate("777", "other_tg"))
+        self.assertEqual(pending.state, "active")
+        self.assertEqual(pending.chat_id, "777")
+        self.assertFalse(pending.bind_token)
+
+    def test_activate_refuses_a_chat_another_user_holds(self):
+        # The race the /start handler cannot see: its search found no clash,
+        # another handler bound the chat meanwhile. The index refuses the
+        # write and the pending binding is left as it was.
+        other = self.env["res.users"].create({"name": "Other", "login": "bound_user_t1_other"})
+        pending = self.env["rteam.tg.binding"].create(
+            {"user_id": other.id, "state": "pending", "bind_token": "tok"}
+        )
+        with mute_logger("odoo.sql_db"):
+            self.assertFalse(pending._activate("123456", "other_tg"))
+        self.assertEqual(pending.state, "pending")
+        self.assertFalse(pending.chat_id)
+        self.assertEqual(pending.bind_token, "tok")
+        self.assertEqual(self.binding.state, "active")
+
     # ---------------------------------------------------------------- issue
 
     def test_issue_challenge_sends_and_persists_hash(self):

@@ -1,6 +1,6 @@
 {
     "name": "Telegram 2FA & Approvals",
-    "version": "19.0.2.1.3",
+    "version": "19.0.2.1.4",
     "category": "Productivity",
     "summary": "Approve POs, invoices and more from Telegram with one tap. Login 2FA included.",
     "description": """
