@@ -28,7 +28,7 @@
                                 type="object"
                                 string="Open in Telegram"
                                 class="btn-primary btn-lg"
-                                icon="fa-telegram"/>
+                                icon="oi_telegram"/>
                     </div>
                     <div class="alert alert-info" role="alert">
                         After you press Send in Telegram, click <strong>I sent it</strong>

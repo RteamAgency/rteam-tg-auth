@@ -20,20 +20,20 @@
                                 type="object"
                                 string="Bind Telegram"
                                 class="btn-primary"
-                                icon="fa-telegram"
+                                icon="oi_telegram"
                                 invisible="tg_2fa_state == 'active'"/>
                         <button name="action_rteam_tg_generate_recovery"
                                 type="object"
                                 string="Generate recovery codes"
                                 class="btn-secondary"
-                                icon="fa-key"
+                                icon="key"
                                 confirm="Generating fresh codes invalidates the current set. Continue?"
                                 invisible="tg_2fa_state != 'active'"/>
                         <button name="action_rteam_tg_unbind"
                                 type="object"
                                 string="Unbind"
                                 class="btn-secondary"
-                                icon="fa-unlink"
+                                icon="link_off"
                                 confirm="Remove the Telegram binding for this user? Recovery codes (if generated) will be lost."
                                 invisible="tg_2fa_state == 'none'"/>
                     </div>
@@ -75,20 +75,20 @@
                                 type="object"
                                 string="Bind Telegram"
                                 class="btn-primary"
-                                icon="fa-telegram"
+                                icon="oi_telegram"
                                 invisible="tg_2fa_state == 'active'"/>
                         <button name="action_rteam_tg_generate_recovery"
                                 type="object"
                                 string="Generate recovery codes"
                                 class="btn-secondary"
-                                icon="fa-key"
+                                icon="key"
                                 confirm="Generating fresh codes invalidates the current set. Continue?"
                                 invisible="tg_2fa_state != 'active'"/>
                         <button name="action_rteam_tg_unbind"
                                 type="object"
                                 string="Unbind"
                                 class="btn-secondary"
-                                icon="fa-unlink"
+                                icon="link_off"
                                 confirm="Remove your Telegram binding? Recovery codes (if generated) will be lost."
                                 invisible="tg_2fa_state == 'none'"/>
                     </div>

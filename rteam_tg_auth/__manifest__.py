@@ -87,7 +87,6 @@ follow on the ``17.0`` and ``18.0`` branches.
     },
     "data": [
         "security/rteam_tg_auth_security.xml",
-        "security/ir.model.access.csv",
         "data/ir_config_parameter_data.xml",
         "wizard/rteam_tg_bind_wizard_views.xml",
         "wizard/rteam_tg_recovery_codes_wizard_views.xml",
@@ -98,6 +97,7 @@ follow on the ``17.0`` and ``18.0`` branches.
         "views/res_config_settings_views.xml",
         "views/rteam_tg_login_template.xml",
         "views/rteam_tg_auth_menus.xml",
+        'security/ir.access.csv',
     ],
     "images": [
         "static/description/banner.png",

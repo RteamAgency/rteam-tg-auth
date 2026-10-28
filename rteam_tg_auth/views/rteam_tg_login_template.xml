@@ -2,8 +2,7 @@
 <odoo>
 
     <template id="tg_login_form" name="Telegram 2FA Login">
-        <t t-call="web.login_layout">
-            <t t-set="disable_footer">1</t>
+        <t t-call="web.login_layout" disable_footer.translate="1">
             <div class="oe_login_form">
                 <h5 class="card-title">Telegram 2FA</h5>
 

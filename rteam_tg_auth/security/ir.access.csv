@@ -1,0 +1,8 @@
+id,name,model_id,group_id/id,operation,domain
+rule_tg_binding_user_own,Telegram binding: user sees own only,rteam.tg.binding,rteam_tg_auth.group_rteam_tg_user,crud,"[('user_id', '=', user.id)]"
+rule_tg_binding_admin_all,Telegram binding: admin sees all,rteam.tg.binding,rteam_tg_auth.group_rteam_tg_admin,crud,
+access_rteam_tg_audit_admin,rteam.tg.audit.admin,rteam.tg.audit,rteam_tg_auth.group_rteam_tg_admin,r,
+access_rteam_tg_bind_wizard_user,rteam.tg.bind.wizard.user,rteam.tg.bind.wizard,base.group_user,crud,
+access_rteam_tg_recovery_codes_wizard_user,rteam.tg.recovery.codes.wizard.user,rteam.tg.recovery.codes.wizard,base.group_user,crud,
+rule_tg_approval_user_own,Telegram approval: user sees own (as requester or approver),rteam.tg.approval.request,rteam_tg_auth.group_rteam_tg_user,r,"['|', ('approver_user_id', '=', user.id), ('requester_user_id', '=', user.id)]"
+rule_tg_approval_admin_all,Telegram approval: admin sees all,rteam.tg.approval.request,rteam_tg_auth.group_rteam_tg_admin,crud,

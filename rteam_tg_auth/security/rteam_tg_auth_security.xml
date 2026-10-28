@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
     <!-- Group definitions and record rules: noupdate=1 so an admin's
@@ -17,35 +16,7 @@
             <field name="implied_ids" eval="[(4, ref('group_rteam_tg_user'))]"/>
         </record>
 
-        <record id="rule_tg_binding_user_own" model="ir.rule">
-            <field name="name">Telegram binding: user sees own only</field>
-            <field name="model_id" ref="model_rteam_tg_binding"/>
-            <field name="domain_force">[('user_id', '=', user.id)]</field>
-            <field name="groups" eval="[(4, ref('group_rteam_tg_user'))]"/>
-        </record>
-
-        <record id="rule_tg_binding_admin_all" model="ir.rule">
-            <field name="name">Telegram binding: admin sees all</field>
-            <field name="model_id" ref="model_rteam_tg_binding"/>
-            <field name="domain_force">[(1, '=', 1)]</field>
-            <field name="groups" eval="[(4, ref('group_rteam_tg_admin'))]"/>
-        </record>
-
-        <record id="rule_tg_approval_user_own" model="ir.rule">
-            <field name="name">Telegram approval: user sees own (as requester or approver)</field>
-            <field name="model_id" ref="model_rteam_tg_approval_request"/>
-            <field name="domain_force">['|', ('approver_user_id', '=', user.id), ('requester_user_id', '=', user.id)]</field>
-            <field name="groups" eval="[(4, ref('group_rteam_tg_user'))]"/>
-        </record>
-
-        <record id="rule_tg_approval_admin_all" model="ir.rule">
-            <field name="name">Telegram approval: admin sees all</field>
-            <field name="model_id" ref="model_rteam_tg_approval_request"/>
-            <field name="domain_force">[(1, '=', 1)]</field>
-            <field name="groups" eval="[(4, ref('group_rteam_tg_admin'))]"/>
-        </record>
-
-    </data>
+        </data>
 
     <!-- Cross-grants on existing base groups: NO noupdate, so on every
          module upgrade we re-confirm that every internal user gets the

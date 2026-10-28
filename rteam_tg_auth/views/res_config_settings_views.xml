@@ -20,7 +20,7 @@
                                         type="object"
                                         string="Validate"
                                         class="btn-primary"
-                                        icon="fa-check-circle"/>
+                                        icon="check_circle" icon_class="oi-filled"/>
                             </div>
                         </setting>
                     </block>
@@ -36,7 +36,7 @@
                                         type="object"
                                         string="Register Webhook"
                                         class="btn-primary"
-                                        icon="fa-link"/>
+                                        icon="link"/>
                             </div>
                         </setting>
                     </block>
